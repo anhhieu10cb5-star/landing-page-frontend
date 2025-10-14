@@ -8,7 +8,6 @@ const AdminProjectForm = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [projectId, setProjectId] = useState(null);
 
-  // Form data
   const [formData, setFormData] = useState({
     projectCode: '',
     projectName: '',
@@ -30,7 +29,6 @@ const AdminProjectForm = () => {
   const [newTech, setNewTech] = useState('');
 
   useEffect(() => {
-    // Check if edit mode (URL contains /edit/:id)
     const path = window.location.pathname;
     if (path.includes('/edit/')) {
       const id = path.split('/edit/')[1];
@@ -44,7 +42,7 @@ const AdminProjectForm = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/projects/${id}`, {
+      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/projects/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -54,7 +52,6 @@ const AdminProjectForm = () => {
       if (data.success) {
         const project = data.data;
         
-        // Map backend types to form types
         const typeReverseMap = {
           'website': 'Website',
           'mobile-app': 'Mobile App',
@@ -64,7 +61,6 @@ const AdminProjectForm = () => {
           'backend': 'Backend API'
         };
 
-        // Map backend status to form status
         const statusReverseMap = {
           'pending': 'Pending',
           'in-progress': 'In Progress',
@@ -76,7 +72,7 @@ const AdminProjectForm = () => {
 
         setFormData({
           projectCode: project.projectCode,
-          projectName: project.title, // Backend uses 'title'
+          projectName: project.title,
           description: project.description || '',
           clientName: project.clientName,
           clientEmail: project.clientEmail,
@@ -86,14 +82,13 @@ const AdminProjectForm = () => {
           progress: project.progress || 0,
           budget: project.budget || '',
           startDate: project.startDate ? project.startDate.split('T')[0] : '',
-          endDate: project.estimatedEndDate ? project.estimatedEndDate.split('T')[0] : '', // Backend uses 'estimatedEndDate'
+          endDate: project.estimatedEndDate ? project.estimatedEndDate.split('T')[0] : '',
           technologies: project.technologies || [],
           notes: project.notes || ''
         });
 
-        // Map milestones from backend format
         setMilestones((project.milestones || []).map(m => ({
-          name: m.title, // Backend milestone uses 'title'
+          name: m.title,
           description: m.description || '',
           status: statusReverseMap[m.status] || 'Pending',
           dueDate: m.dueDate ? m.dueDate.split('T')[0] : ''
@@ -195,8 +190,8 @@ const AdminProjectForm = () => {
       };
 
       const url = isEdit 
-        ? `http://localhost:5000/api/projects/${projectId}`
-        : 'http://localhost:5000/api/projects';
+        ? `https://main-landing-page-backend-production.up.railway.app/api/projects/${projectId}`
+        : 'https://main-landing-page-backend-production.up.railway.app/api/projects';
       
       const method = isEdit ? 'PUT' : 'POST';
 
@@ -239,7 +234,6 @@ const AdminProjectForm = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-white p-8">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
             <button
@@ -259,7 +253,6 @@ const AdminProjectForm = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Basic Info */}
           <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-cyan-500/20 p-6">
             <h2 className="text-2xl font-bold mb-6">Thông tin cơ bản</h2>
             
@@ -314,7 +307,6 @@ const AdminProjectForm = () => {
             </div>
           </div>
 
-          {/* Client Info */}
           <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-cyan-500/20 p-6">
             <h2 className="text-2xl font-bold mb-6">Thông tin khách hàng</h2>
             
@@ -365,7 +357,6 @@ const AdminProjectForm = () => {
             </div>
           </div>
 
-          {/* Project Details */}
           <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-cyan-500/20 p-6">
             <h2 className="text-2xl font-bold mb-6">Chi tiết dự án</h2>
             
@@ -465,7 +456,6 @@ const AdminProjectForm = () => {
             </div>
           </div>
 
-          {/* Technologies */}
           <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-cyan-500/20 p-6">
             <h2 className="text-2xl font-bold mb-6">Công nghệ sử dụng</h2>
             
@@ -507,7 +497,6 @@ const AdminProjectForm = () => {
             </div>
           </div>
 
-          {/* Milestones */}
           <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-cyan-500/20 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Milestones</h2>
@@ -591,7 +580,6 @@ const AdminProjectForm = () => {
             </div>
           </div>
 
-          {/* Notes */}
           <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-cyan-500/20 p-6">
             <h2 className="text-2xl font-bold mb-6">Ghi chú</h2>
             <textarea
@@ -604,7 +592,6 @@ const AdminProjectForm = () => {
             ></textarea>
           </div>
 
-          {/* Submit Buttons */}
           <div className="flex items-center justify-end space-x-4">
             <button
               type="button"

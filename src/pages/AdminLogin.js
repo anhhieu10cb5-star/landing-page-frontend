@@ -28,7 +28,7 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('https://main-landing-page-backend-production.up.railway.app/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,7 +42,6 @@ const AdminLogin = () => {
         throw new Error(data.message || 'Login failed');
       }
 
-      // ✅ SỬA: Backend trả về { success: true, data: { admin, token } }
       console.log('✅ Login response:', data);
       console.log('✅ Token:', data.data.token);
       console.log('✅ Admin:', data.data.admin);
@@ -61,7 +60,7 @@ const AdminLogin = () => {
   };
 
   return (
-  <div className="min-h-screen flex items-center justify-center bg-slate-950">
+    <div className="min-h-screen flex items-center justify-center bg-slate-950">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl mb-4">

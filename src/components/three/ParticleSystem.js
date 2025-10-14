@@ -1,5 +1,4 @@
-// src/components/three/ParticleSystem.js - FULL VIP EDITION
-// Part 1: Class setup + Basic systems
+// src/components/three/ParticleSystem.js - FIXED (No Milky Way)
 
 import * as THREE from 'three';
 
@@ -9,15 +8,11 @@ class ParticleSystem {
     this.count = count;
     this.starCount = starCount;
     
-    // Existing systems
     this.particles = null;
     this.stars = null;
-    this.milkyWay = null;
     this.geometricShapes = [];
     this.shootingStars = [];
     this.constellationLines = null;
-    
-    // NEW VIP SYSTEMS
     this.nebulaClouds = [];
     this.planets = [];
     this.particleTrails = [];
@@ -30,20 +25,16 @@ class ParticleSystem {
   }
 
   init() {
-    this.createStarfieldLayers(); // NEW: Multi-layer parallax stars
+    this.createStarfieldLayers();
     this.createStarfield();
-    this.createMilkyWay();
-    this.createNebulaClouds(); // NEW: Nebula clouds
-    this.createPlanets(); // NEW: Planets
-    this.createAuroraEffect(); // NEW: Aurora
+    this.createNebulaClouds();
+    this.createPlanets();
+    this.createAuroraEffect();
     this.createParticles();
-    this.createParticleTrails(); // NEW: Particle trails
-    this.createGeometricShapes();
+    // REMOVED: this.createGeometricShapes(); - THIS WAS THE WHEEL (TorusGeometry)!
     this.createShootingStars();
-    this.createConstellationLines();
   }
 
-  // NEW: Multi-layer starfield for parallax effect
   createStarfieldLayers() {
     const layers = [
       { count: 2000, range: 800, speed: 0.00002, size: [0.3, 1.0], name: 'far' },
@@ -82,7 +73,6 @@ class ParticleSystem {
 
         sizes[i] = layer.size[0] + Math.random() * (layer.size[1] - layer.size[0]);
         
-        // Depth of field effect
         const distance = Math.sqrt(
           positions[i3] ** 2 + 
           positions[i3 + 1] ** 2 + 
@@ -219,7 +209,6 @@ class ParticleSystem {
           
           vec3 pos = position;
           
-          // Interactive: stars avoid mouse
           vec2 mouseInfluence = mousePos * 100.0;
           float distToMouse = length(pos.xy - mouseInfluence);
           if (distToMouse < 50.0) {
@@ -275,105 +264,8 @@ class ParticleSystem {
     this.scene.add(this.stars);
   }
 
-  createMilkyWay() {
-    const milkyWayCount = 5000;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(milkyWayCount * 3);
-    const colors = new Float32Array(milkyWayCount * 3);
-    const sizes = new Float32Array(milkyWayCount);
-    
-    for (let i = 0; i < milkyWayCount; i++) {
-      const i3 = i * 3;
-      
-      const angle = Math.random() * Math.PI * 2;
-      const radius = 150 + Math.random() * 100;
-      const thickness = (Math.random() - 0.5) * 30;
-      const curve = Math.sin(angle * 3) * 20;
-      
-      positions[i3] = Math.cos(angle) * radius + (Math.random() - 0.5) * 50;
-      positions[i3 + 1] = thickness + curve;
-      positions[i3 + 2] = Math.sin(angle) * radius + (Math.random() - 0.5) * 50;
-      
-      const colorType = Math.random();
-      if (colorType > 0.7) {
-        colors[i3] = 0.6 + Math.random() * 0.3;
-        colors[i3 + 1] = 0.4 + Math.random() * 0.3;
-        colors[i3 + 2] = 0.8 + Math.random() * 0.2;
-      } else if (colorType > 0.4) {
-        colors[i3] = 0.4 + Math.random() * 0.3;
-        colors[i3 + 1] = 0.6 + Math.random() * 0.3;
-        colors[i3 + 2] = 0.9 + Math.random() * 0.1;
-      } else {
-        colors[i3] = 0.85 + Math.random() * 0.15;
-        colors[i3 + 1] = 0.85 + Math.random() * 0.15;
-        colors[i3 + 2] = 0.9 + Math.random() * 0.1;
-      }
-      
-      sizes[i] = Math.random() * 1.5 + 0.3;
-    }
-    
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-    
-    const material = new THREE.ShaderMaterial({
-      uniforms: {
-        time: { value: 0 }
-      },
-      vertexShader: `
-        attribute float size;
-        attribute vec3 color;
-        varying vec3 vColor;
-        
-        void main() {
-          vColor = color;
-          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-          gl_PointSize = size * (300.0 / -mvPosition.z);
-          gl_Position = projectionMatrix * mvPosition;
-        }
-      `,
-      fragmentShader: `
-        uniform float time;
-        varying vec3 vColor;
-        
-        float star5(vec2 p, float r, float rf) {
-          const vec2 k1 = vec2(0.809016994375, -0.587785252292);
-          const vec2 k2 = vec2(-k1.x, k1.y);
-          p.x = abs(p.x);
-          p -= 2.0 * max(dot(k1, p), 0.0) * k1;
-          p -= 2.0 * max(dot(k2, p), 0.0) * k2;
-          p.x = abs(p.x);
-          p.y -= r;
-          vec2 ba = rf * vec2(-k1.y, k1.x) - vec2(0, 1);
-          float h = clamp(dot(p, ba) / dot(ba, ba), 0.0, r);
-          return length(p - ba * h) * sign(p.y * ba.x - p.x * ba.y);
-        }
-        
-        void main() {
-          vec2 center = gl_PointCoord - 0.5;
-          float dist = star5(center * 2.0, 0.5, 0.35);
-          
-          float alpha = 1.0 - smoothstep(-0.05, 0.15, dist);
-          float glow = exp(-dist * 6.0) * 0.6;
-          alpha += glow;
-          
-          vec3 finalColor = vColor * (1.0 + glow * 0.8);
-          
-          gl_FragColor = vec4(finalColor, alpha * 0.7);
-        }
-      `,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-    
-    this.milkyWay = new THREE.Points(geometry, material);
-    this.milkyWay.rotation.x = Math.PI / 6;
-    this.scene.add(this.milkyWay);
-  }
+  // REMOVED createMilkyWay() - This was creating the wheel shape!
 
-  // Continue in Part 2...
-  // NEW: Nebula clouds - Volumetric clouds in space
   createNebulaClouds() {
     const cloudCount = 5;
     
@@ -450,7 +342,6 @@ class ParticleSystem {
     }
   }
 
-  // NEW: Planets with rim lighting
   createPlanets() {
     const planetConfigs = [
       { radius: 15, color: 0x4a5568, emissive: 0x0ea5e9, position: { x: -120, y: 80, z: -200 } },
@@ -516,7 +407,6 @@ class ParticleSystem {
     });
   }
 
-  // NEW: Aurora effect
   createAuroraEffect() {
     const geometry = new THREE.PlaneGeometry(400, 100, 64, 32);
     
@@ -589,63 +479,7 @@ class ParticleSystem {
     this.scene.add(this.auroraEffect);
   }
 
-  // NEW: Particle trails
-  createParticleTrails() {
-    const trailCount = 300;
-    
-    for (let i = 0; i < trailCount; i++) {
-      const trailLength = 15;
-      const points = [];
-      const startPos = new THREE.Vector3(
-        (Math.random() - 0.5) * 300,
-        (Math.random() - 0.5) * 300,
-        (Math.random() - 0.5) * 300
-      );
-      
-      const velocity = new THREE.Vector3(
-        (Math.random() - 0.5) * 0.5,
-        (Math.random() - 0.5) * 0.5,
-        (Math.random() - 0.5) * 0.5
-      );
-      
-      for (let j = 0; j < trailLength; j++) {
-        const point = startPos.clone().add(velocity.clone().multiplyScalar(-j));
-        points.push(point);
-      }
-      
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      const colors = new Float32Array(trailLength * 3);
-      
-      const baseColor = new THREE.Color();
-      baseColor.setHSL(0.55 + Math.random() * 0.15, 0.7, 0.6);
-      
-      for (let j = 0; j < trailLength; j++) {
-        const j3 = j * 3;
-        colors[j3] = baseColor.r;
-        colors[j3 + 1] = baseColor.g;
-        colors[j3 + 2] = baseColor.b;
-      }
-      
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      
-      const material = new THREE.LineBasicMaterial({
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.3,
-        blending: THREE.AdditiveBlending
-      });
-      
-      const line = new THREE.Line(geometry, material);
-      this.scene.add(line);
-      
-      this.particleTrails.push({
-        line,
-        points,
-        velocity,
-        baseOpacity: 0.2 + Math.random() * 0.3
-      });
-    }
-  }
+  // REMOVED createParticleTrails() - This creates blue/cyan trail lines
 
   createParticles() {
     const geometry = new THREE.BufferGeometry();
@@ -728,45 +562,7 @@ class ParticleSystem {
     this.scene.add(this.particles);
   }
 
-  createGeometricShapes() {
-    const shapes = [
-      { geometry: new THREE.BoxGeometry(8, 8, 8), color: 0x1e3a8a, position: { x: -30, y: 20, z: -20 } },
-      { geometry: new THREE.ConeGeometry(5, 12, 4), color: 0x0e7490, position: { x: 30, y: -20, z: -15 } },
-      { geometry: new THREE.OctahedronGeometry(6), color: 0x1e40af, position: { x: 0, y: 30, z: -30 } },
-      { geometry: new THREE.TorusGeometry(6, 2, 16, 100), color: 0x164e63, position: { x: -35, y: -25, z: -25 } },
-      { geometry: new THREE.TetrahedronGeometry(7), color: 0x0c4a6e, position: { x: 35, y: 15, z: -20 } }
-    ];
-
-    shapes.forEach(shape => {
-      const material = new THREE.MeshPhongMaterial({
-        color: shape.color,
-        transparent: true,
-        opacity: 0.2,
-        wireframe: true,
-        emissive: shape.color,
-        emissiveIntensity: 0.3
-      });
-      
-      const mesh = new THREE.Mesh(shape.geometry, material);
-      mesh.position.set(shape.position.x, shape.position.y, shape.position.z);
-      mesh.rotation.set(
-        Math.random() * Math.PI,
-        Math.random() * Math.PI,
-        Math.random() * Math.PI
-      );
-      
-      this.geometricShapes.push({
-        mesh,
-        rotationSpeed: {
-          x: (Math.random() - 0.5) * 0.015,
-          y: (Math.random() - 0.5) * 0.015,
-          z: (Math.random() - 0.5) * 0.015
-        }
-      });
-      
-      this.scene.add(mesh);
-    });
-  }
+  // REMOVED createGeometricShapes() - This creates the wheel (TorusGeometry) and cubes
 
   createShootingStars() {
     const shootingStarCount = 7;
@@ -815,105 +611,26 @@ class ParticleSystem {
     }
   }
 
-  createConstellationLines() {
-    const maxConnections = 150;
-    const maxDistance = 30;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(maxConnections * 6);
-    const colors = new Float32Array(maxConnections * 6);
-    
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setDrawRange(0, 0);
-    
-    const material = new THREE.LineBasicMaterial({
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.3,
-      blending: THREE.AdditiveBlending
-    });
-    
-    this.constellationLines = new THREE.LineSegments(geometry, material);
-    this.scene.add(this.constellationLines);
-    
-    this.maxDistance = maxDistance;
-    this.maxConnections = maxConnections;
-  }
+  // REMOVED createConstellationLines() - Lines connecting stars
 
-  updateConstellationLines() {
-    if (!this.particles || !this.constellationLines) return;
-    
-    const positions = this.particles.geometry.attributes.position.array;
-    const linePositions = this.constellationLines.geometry.attributes.position.array;
-    const lineColors = this.constellationLines.geometry.attributes.color.array;
-    
-    let connectionCount = 0;
-    
-    for (let i = 0; i < this.count && connectionCount < this.maxConnections; i++) {
-      const i3 = i * 3;
-      const pos1 = new THREE.Vector3(positions[i3], positions[i3 + 1], positions[i3 + 2]);
-      
-      for (let j = i + 1; j < this.count && connectionCount < this.maxConnections; j++) {
-        const j3 = j * 3;
-        const pos2 = new THREE.Vector3(positions[j3], positions[j3 + 1], positions[j3 + 2]);
-        
-        const distance = pos1.distanceTo(pos2);
-        
-        if (distance < this.maxDistance) {
-          const lineIndex = connectionCount * 6;
-          
-          linePositions[lineIndex] = pos1.x;
-          linePositions[lineIndex + 1] = pos1.y;
-          linePositions[lineIndex + 2] = pos1.z;
-          linePositions[lineIndex + 3] = pos2.x;
-          linePositions[lineIndex + 4] = pos2.y;
-          linePositions[lineIndex + 5] = pos2.z;
-          
-          const alpha = 1 - (distance / this.maxDistance);
-          const color = new THREE.Color().setHSL(0.55, 0.6, 0.5);
-          
-          lineColors[lineIndex] = color.r;
-          lineColors[lineIndex + 1] = color.g;
-          lineColors[lineIndex + 2] = color.b;
-          lineColors[lineIndex + 3] = color.r;
-          lineColors[lineIndex + 4] = color.g;
-          lineColors[lineIndex + 5] = color.b;
-          
-          connectionCount++;
-        }
-      }
-    }
-    
-    this.constellationLines.geometry.setDrawRange(0, connectionCount * 2);
-    this.constellationLines.geometry.attributes.position.needsUpdate = true;
-    this.constellationLines.geometry.attributes.color.needsUpdate = true;
-  }
-
-  // Continue to Part 3 for animate() and dispose()...
-  // Method to update mouse position (call from ThreeBackground)
   updateMousePosition(x, y) {
     this.targetMousePosition.x = x;
     this.targetMousePosition.y = y;
   }
 
   animate(time, mouseX, mouseY) {
-    // Smooth mouse interpolation
     this.mousePosition.x += (mouseX - this.mousePosition.x) * 0.05;
     this.mousePosition.y += (mouseY - this.mousePosition.y) * 0.05;
     
-    // Update starfield layers with parallax
     this.starfieldLayers.forEach(layer => {
       if (layer.points.material.uniforms) {
         layer.points.material.uniforms.time.value = time;
       }
       layer.points.rotation.y = time * layer.speed;
       layer.points.rotation.x = time * layer.speed * 0.5;
-      
-      // Mouse parallax
       layer.points.rotation.z = this.mousePosition.x * 0.02 * (layer.speed / 0.0001);
     });
 
-    // Update main stars with mouse interaction
     if (this.stars && this.stars.material.uniforms) {
       this.stars.material.uniforms.time.value = time;
       this.stars.material.uniforms.mousePos.value.set(this.mousePosition.x, this.mousePosition.y);
@@ -921,13 +638,8 @@ class ParticleSystem {
       this.stars.rotation.x = time * 0.00003;
     }
 
-    // Update milky way
-    if (this.milkyWay && this.milkyWay.material.uniforms) {
-      this.milkyWay.material.uniforms.time.value = time;
-      this.milkyWay.rotation.y = time * 0.00002;
-    }
+    // REMOVED Milky Way animation
 
-    // Animate nebula clouds
     this.nebulaClouds.forEach(cloud => {
       cloud.mesh.rotation.x += cloud.rotationSpeed.x;
       cloud.mesh.rotation.y += cloud.rotationSpeed.y;
@@ -936,12 +648,10 @@ class ParticleSystem {
       cloud.mesh.position.x += Math.sin(time * 0.0001) * cloud.driftSpeed.x;
       cloud.mesh.position.y += Math.cos(time * 0.00008) * cloud.driftSpeed.y;
       
-      // Pulsing opacity
       const pulse = Math.sin(time * 0.001) * 0.05 + 0.15;
       cloud.mesh.material.opacity = pulse;
     });
 
-    // Animate planets with orbit and rim lighting
     this.planets.forEach(planet => {
       if (planet.mesh.material.uniforms) {
         planet.mesh.material.uniforms.time.value = time;
@@ -949,48 +659,18 @@ class ParticleSystem {
       
       planet.mesh.rotation.y += planet.rotationSpeed;
       
-      // Orbit animation
       planet.orbitAngle += planet.orbitSpeed;
       planet.mesh.position.x = Math.cos(planet.orbitAngle) * planet.orbitRadius;
       planet.mesh.position.y = Math.sin(planet.orbitAngle) * planet.orbitRadius;
     });
 
-    // Animate aurora
     if (this.auroraEffect && this.auroraEffect.material.uniforms) {
       this.auroraEffect.material.uniforms.time.value = time;
       this.auroraEffect.rotation.z = Math.sin(time * 0.0003) * 0.1;
     }
 
-    // Animate particle trails
-    this.particleTrails.forEach(trail => {
-      // Update trail positions
-      for (let i = trail.points.length - 1; i > 0; i--) {
-        trail.points[i].copy(trail.points[i - 1]);
-      }
-      
-      // Update head position
-      trail.points[0].add(trail.velocity);
-      
-      // Wrap around boundaries
-      if (Math.abs(trail.points[0].x) > 300) trail.points[0].x *= -0.9;
-      if (Math.abs(trail.points[0].y) > 300) trail.points[0].y *= -0.9;
-      if (Math.abs(trail.points[0].z) > 300) trail.points[0].z *= -0.9;
-      
-      // Update geometry
-      const positions = trail.line.geometry.attributes.position.array;
-      for (let i = 0; i < trail.points.length; i++) {
-        positions[i * 3] = trail.points[i].x;
-        positions[i * 3 + 1] = trail.points[i].y;
-        positions[i * 3 + 2] = trail.points[i].z;
-      }
-      trail.line.geometry.attributes.position.needsUpdate = true;
-      
-      // Fade trail based on speed
-      const speed = trail.velocity.length();
-      trail.line.material.opacity = trail.baseOpacity * (0.5 + speed * 2);
-    });
+    // REMOVED particle trails animation
 
-    // Update main particles
     if (this.particles) {
       if (this.particles.material.uniforms) {
         this.particles.material.uniforms.time.value = time;
@@ -1003,7 +683,6 @@ class ParticleSystem {
       for (let i = 0; i < positions.length; i += 3) {
         positions[i + 1] += Math.sin(time * 0.001 + positions[i]) * 0.02;
         
-        // Mouse interaction - wave effect
         const dx = positions[i] - this.mousePosition.x * 100;
         const dy = positions[i + 1] - this.mousePosition.y * 100;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -1015,20 +694,11 @@ class ParticleSystem {
       }
       this.particles.geometry.attributes.position.needsUpdate = true;
       
-      this.updateConstellationLines();
+      // REMOVED updateConstellationLines()
     }
 
-    // Animate geometric shapes
-    this.geometricShapes.forEach(shape => {
-      shape.mesh.rotation.x += shape.rotationSpeed.x;
-      shape.mesh.rotation.y += shape.rotationSpeed.y;
-      shape.mesh.rotation.z += shape.rotationSpeed.z;
+    // REMOVED geometric shapes animation
 
-      shape.mesh.position.x += Math.sin(time * 0.0005) * 0.02;
-      shape.mesh.position.y += Math.cos(time * 0.0007) * 0.02;
-    });
-
-    // Animate shooting stars
     this.shootingStars.forEach(star => {
       star.life += 0.016;
       
@@ -1080,82 +750,55 @@ class ParticleSystem {
   }
 
   dispose() {
-    // Dispose starfield layers
     this.starfieldLayers.forEach(layer => {
       layer.points.geometry.dispose();
       layer.points.material.dispose();
       this.scene.remove(layer.points);
     });
 
-    // Dispose main stars
     if (this.stars) {
       this.stars.geometry.dispose();
       this.stars.material.dispose();
       this.scene.remove(this.stars);
     }
 
-    // Dispose milky way
-    if (this.milkyWay) {
-      this.milkyWay.geometry.dispose();
-      this.milkyWay.material.dispose();
-      this.scene.remove(this.milkyWay);
-    }
+    // REMOVED Milky Way disposal
 
-    // Dispose nebula clouds
     this.nebulaClouds.forEach(cloud => {
       cloud.mesh.geometry.dispose();
       cloud.mesh.material.dispose();
       this.scene.remove(cloud.mesh);
     });
 
-    // Dispose planets
     this.planets.forEach(planet => {
       planet.mesh.geometry.dispose();
       planet.mesh.material.dispose();
       this.scene.remove(planet.mesh);
     });
 
-    // Dispose aurora
     if (this.auroraEffect) {
       this.auroraEffect.geometry.dispose();
       this.auroraEffect.material.dispose();
       this.scene.remove(this.auroraEffect);
     }
 
-    // Dispose particle trails
-    this.particleTrails.forEach(trail => {
-      trail.line.geometry.dispose();
-      trail.line.material.dispose();
-      this.scene.remove(trail.line);
-    });
+    // REMOVED particle trails disposal
 
-    // Dispose main particles
     if (this.particles) {
       this.particles.geometry.dispose();
       this.particles.material.dispose();
       this.scene.remove(this.particles);
     }
 
-    // Dispose geometric shapes
-    this.geometricShapes.forEach(shape => {
-      shape.mesh.geometry.dispose();
-      shape.mesh.material.dispose();
-      this.scene.remove(shape.mesh);
-    });
+    // REMOVED geometric shapes disposal
 
-    // Dispose shooting stars
     this.shootingStars.forEach(star => {
       star.line.geometry.dispose();
       star.line.material.dispose();
       this.scene.remove(star.line);
     });
 
-    // Dispose constellation lines
-    if (this.constellationLines) {
-      this.constellationLines.geometry.dispose();
-      this.constellationLines.material.dispose();
-      this.scene.remove(this.constellationLines);
-    }
+    // REMOVED constellation lines disposal
   }
 }
 

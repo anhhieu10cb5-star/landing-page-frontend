@@ -1,4 +1,4 @@
-// src/LandingPage.js - PART 1
+// src/LandingPage.js - NO BACKDROP BLUR VERSION
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Code, Globe, Smartphone, Server, Mail, Github, MessageSquare, ExternalLink, CheckCircle, Star, ArrowRight, Check, ChevronDown } from 'lucide-react';
 import ContactForm from './components/ContactForm';
@@ -448,11 +448,11 @@ function LandingPage() {
 
   const t = content[lang];
 
-  return (
-    <div className="relative z-10">
+return (
+  <div className="relative" style={{ zIndex: 10 }}>
       {/* NAVIGATION */}
       <nav className={`fixed top-0 w-full z-50 border-b transition-all duration-300 ${
-        scrolled ? 'bg-slate-900/95 backdrop-blur-lg border-cyan-500/30 shadow-lg shadow-cyan-500/10' : 'bg-slate-900/80 backdrop-blur-md border-cyan-500/20'
+        scrolled ? 'bg-slate-900/95 border-cyan-500/30 shadow-lg shadow-cyan-500/10' : 'bg-slate-900/80 border-cyan-500/20'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -487,7 +487,7 @@ function LandingPage() {
         </div>
 
         {/* Project Tracker Bar */}
-        <div className="w-full border-t border-cyan-500/20 bg-slate-900/90 backdrop-blur-md py-3 px-4">
+        <div className="w-full border-t border-cyan-500/20 bg-slate-900/90 py-3 px-4">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-3">
             <span className="text-cyan-300 text-sm font-semibold whitespace-nowrap flex items-center gap-2">
               <span className="text-lg">📊</span>
@@ -528,8 +528,7 @@ function LandingPage() {
         )}
       </nav>
       {/* HERO SECTION */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-slate-900/60 to-slate-900/80 pointer-events-none"></div>
+      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative min-h-[70vh] flex items-center">
         
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-white mb-6 leading-tight animate-fade-in" style={{
@@ -564,8 +563,7 @@ function LandingPage() {
           <div className="mb-8 max-w-4xl mx-auto">
             <p className="text-lg sm:text-xl md:text-2xl text-white font-bold leading-relaxed px-4 py-4 rounded-2xl inline-block" style={{
               textShadow: '0 4px 12px rgba(0, 0, 0, 1), 0 0 30px rgba(0, 0, 0, 0.8)',
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
-              backdropFilter: 'blur(10px)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9))',
               border: '1px solid rgba(34, 211, 238, 0.2)'
             }}>
               {t.hero.description}
@@ -583,7 +581,7 @@ function LandingPage() {
             ].map((service, index) => (
               <div 
                 key={index}
-                className={`bg-gradient-to-r ${service.bg} backdrop-blur-xl border-2 border-white/30 rounded-full px-5 py-2.5 flex items-center space-x-2.5 hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/50`}
+                className={`bg-gradient-to-r ${service.bg} border-2 border-white/30 rounded-full px-5 py-2.5 flex items-center space-x-2.5 hover:scale-110 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/50`}
               >
                 <span className="text-xl">{service.icon}</span>
                 <span className="text-white text-sm font-bold whitespace-nowrap drop-shadow-lg">{service.text}</span>
@@ -603,7 +601,7 @@ function LandingPage() {
             
             <button 
               onClick={() => scrollToSection('portfolio')}
-              className="bg-slate-800/90 backdrop-blur-xl border-2 border-cyan-400/60 text-cyan-200 px-12 py-5 rounded-2xl font-bold text-lg hover:bg-cyan-500/30 hover:border-cyan-300 transition-all hover:scale-105 shadow-xl shadow-black/50"
+              className="bg-slate-800/90 border-2 border-cyan-400/60 text-cyan-200 px-12 py-5 rounded-2xl font-bold text-lg hover:bg-cyan-500/30 hover:border-cyan-300 transition-all hover:scale-105 shadow-xl shadow-black/50"
             >
               <span className="text-xl">{t.hero.btnPortfolio}</span>
             </button>
@@ -611,7 +609,7 @@ function LandingPage() {
 
           <button
             onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
-            className="inline-flex items-center space-x-3 bg-slate-800/90 backdrop-blur-xl border border-cyan-500/40 text-cyan-200 px-7 py-3.5 rounded-xl hover:bg-slate-800 hover:border-cyan-400/70 transition-all hover:scale-105 shadow-lg font-semibold"
+            className="inline-flex items-center space-x-3 bg-slate-800/90 border border-cyan-500/40 text-cyan-200 px-7 py-3.5 rounded-xl hover:bg-slate-800 hover:border-cyan-400/70 transition-all hover:scale-105 shadow-lg font-semibold"
           >
             <Globe className="w-6 h-6" />
             <span>{t.hero.btnSwitch}</span>
@@ -627,10 +625,21 @@ function LandingPage() {
       </section>
 
       {/* SERVICES SECTION */}
-      <section id="services" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/50 scroll-mt-16">
+      <section id="services" className="py-20 px-4 sm:px-6 lg:px-8 bg-transparent scroll-mt-16">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-white text-center mb-4">{t.services.title}</h2>
-          <p className="text-gray-400 text-center mb-12">{t.services.subtitle}</p>
+          <div className="flex justify-center mb-4">
+            <h2 className="text-4xl font-bold text-white text-center inline-block px-8 py-4 rounded-2xl" style={{
+              textShadow: '0 0 40px rgba(0, 0, 0, 0.9), 0 4px 16px rgba(0, 0, 0, 1)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9))',
+              border: '2px solid rgba(34, 211, 238, 0.3)'
+            }}>{t.services.title}</h2>
+          </div>
+          <div className="flex justify-center mb-12">
+            <p className="text-gray-300 text-center px-6 py-3 rounded-xl inline-block" style={{
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
+              border: '1px solid rgba(34, 211, 238, 0.2)'
+            }}>{t.services.subtitle}</p>
+          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -641,7 +650,7 @@ function LandingPage() {
             ].map((service, index) => (
               <div 
                 key={index}
-                className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/20 hover:border-cyan-500/50 transition group hover:scale-105 duration-300"
+                className="bg-slate-800/80 p-6 rounded-xl border border-cyan-500/20 hover:border-cyan-500/50 transition group hover:scale-105 duration-300"
               >
                 <service.icon className="w-8 h-8 text-cyan-400 mb-4 group-hover:scale-110 transition" />
                 <h3 className="text-xl font-semibold text-white mb-3">{service.data.title}</h3>
@@ -655,14 +664,25 @@ function LandingPage() {
       {/* PORTFOLIO SECTION */}
       <section id="portfolio" className="py-20 px-4 sm:px-6 lg:px-8 scroll-mt-16">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-white text-center mb-4">{t.portfolio.title}</h2>
-          <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">{t.portfolio.subtitle}</p>
+          <div className="flex justify-center mb-4">
+            <h2 className="text-4xl font-bold text-white text-center inline-block px-8 py-4 rounded-2xl" style={{
+              textShadow: '0 0 40px rgba(0, 0, 0, 0.9), 0 4px 16px rgba(0, 0, 0, 1)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9))',
+              border: '2px solid rgba(34, 211, 238, 0.3)'
+            }}>{t.portfolio.title}</h2>
+          </div>
+          <div className="flex justify-center mb-12">
+            <p className="text-gray-300 text-center max-w-2xl px-6 py-3 rounded-xl inline-block" style={{
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
+              border: '1px solid rgba(34, 211, 238, 0.2)'
+            }}>{t.portfolio.subtitle}</p>
+          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {t.portfolio.projects.map((project, index) => (
               <div 
                 key={index}
-                className="bg-slate-800/80 backdrop-blur-sm rounded-xl overflow-hidden border border-cyan-500/20 hover:border-cyan-500/50 transition group hover:scale-105 duration-300"
+                className="bg-slate-800/80 rounded-xl overflow-hidden border border-cyan-500/20 hover:border-cyan-500/50 transition group hover:scale-105 duration-300"
               >
                 <div className="h-48 overflow-hidden relative">
                   <img 
@@ -694,10 +714,21 @@ function LandingPage() {
       </section>
 
       {/* PRICING SECTION */}
-      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/50 scroll-mt-16">
+      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-transparent scroll-mt-16">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-white text-center mb-4">{t.pricing.title}</h2>
-          <p className="text-gray-400 text-center mb-16">{t.pricing.subtitle}</p>
+          <div className="flex justify-center mb-4">
+            <h2 className="text-4xl font-bold text-white text-center inline-block px-8 py-4 rounded-2xl" style={{
+              textShadow: '0 0 40px rgba(0, 0, 0, 0.9), 0 4px 16px rgba(0, 0, 0, 1)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9))',
+              border: '2px solid rgba(34, 211, 238, 0.3)'
+            }}>{t.pricing.title}</h2>
+          </div>
+          <div className="flex justify-center mb-16">
+            <p className="text-gray-300 text-center px-6 py-3 rounded-xl inline-block" style={{
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
+              border: '1px solid rgba(34, 211, 238, 0.2)'
+            }}>{t.pricing.subtitle}</p>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {t.pricing.plans.map((plan, index) => (
@@ -707,7 +738,7 @@ function LandingPage() {
               >
                 <div className={`absolute -inset-1 bg-gradient-to-r ${plan.iconBg} rounded-2xl blur-xl opacity-30 group-hover:opacity-60 transition-all duration-500`}></div>
                 
-                <div className={`relative bg-gradient-to-br ${plan.gradient} backdrop-blur-sm p-8 rounded-2xl border-2 border-white/10 hover:border-white/30 transition-all duration-500 h-full flex flex-col hover:scale-105 hover:shadow-2xl`}>
+                <div className={`relative bg-gradient-to-br ${plan.gradient} p-8 rounded-2xl border-2 border-white/10 hover:border-white/30 transition-all duration-500 h-full flex flex-col hover:scale-105 hover:shadow-2xl`}>
                   
                   <div className="relative z-10 flex-grow">
                     <h3 className="text-2xl font-bold mb-2 text-white">
@@ -756,10 +787,17 @@ function LandingPage() {
           </div>
 
           <div className="mt-16 text-center">
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-gray-300 text-sm mb-4 inline-block px-6 py-3 rounded-xl" style={{
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
+              border: '1px solid rgba(34, 211, 238, 0.2)'
+            }}>
               💡 Giá có thể thay đổi tùy độ phức tạp của dự án
             </p>
-            <p className="text-cyan-300 font-semibold">
+            <br />
+            <p className="text-cyan-300 font-semibold inline-block px-6 py-3 rounded-xl mt-2" style={{
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
+              border: '1px solid rgba(34, 211, 238, 0.3)'
+            }}>
               Liên hệ để được tư vấn chi tiết và báo giá chính xác nhất!
             </p>
           </div>
@@ -772,14 +810,16 @@ function LandingPage() {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4 inline-block px-6 py-3 rounded-2xl" style={{
               textShadow: '0 0 40px rgba(0, 0, 0, 0.9), 0 4px 16px rgba(0, 0, 0, 1), 0 8px 32px rgba(0, 0, 0, 0.8)',
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
-              backdropFilter: 'blur(12px)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9))',
               border: '2px solid rgba(34, 211, 238, 0.3)'
             }}>
               {t.faq.title}
             </h2>
-            <p className="text-gray-300 text-lg mt-6 font-semibold" style={{
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.7)'
+            <br />
+            <p className="text-gray-300 text-lg mt-6 font-semibold inline-block px-6 py-3 rounded-xl" style={{
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.7)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
+              border: '1px solid rgba(34, 211, 238, 0.2)'
             }}>
               {t.faq.subtitle}
             </p>
@@ -789,11 +829,11 @@ function LandingPage() {
             {t.faq.questions.map((item, index) => (
               <div 
                 key={index}
-                className="group bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-sm rounded-2xl border-2 border-cyan-500/20 overflow-hidden hover:border-cyan-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/10"
+                className="group bg-slate-800/80 rounded-2xl border-2 border-cyan-500/20 overflow-hidden hover:border-cyan-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/10"
               >
                 <button
                   onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
-                  className="w-full flex justify-between items-center p-8 text-left group-hover:bg-slate-800/40 transition-colors"
+                  className="w-full flex justify-between items-center p-8 text-left hover:bg-slate-800/60 transition-colors"
                 >
                   <span className="text-xl font-bold text-white pr-6 leading-relaxed">{item.q}</span>
                   <ChevronDown 
@@ -819,19 +859,21 @@ function LandingPage() {
       </section>
 
       {/* ABOUT SECTION */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-transparent">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4 inline-block px-6 py-3 rounded-2xl" style={{
               textShadow: '0 0 40px rgba(0, 0, 0, 0.9), 0 4px 16px rgba(0, 0, 0, 1), 0 8px 32px rgba(0, 0, 0, 0.8)',
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
-              backdropFilter: 'blur(12px)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9))',
               border: '2px solid rgba(34, 211, 238, 0.3)'
             }}>
               {t.about.title}
             </h2>
-            <p className="text-gray-300 text-lg mt-6 font-semibold" style={{
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.7)'
+            <br />
+            <p className="text-gray-300 text-lg mt-6 font-semibold inline-block px-6 py-3 rounded-xl" style={{
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.7)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
+              border: '1px solid rgba(34, 211, 238, 0.2)'
             }}>
               {t.about.subtitle}
             </p>
@@ -845,7 +887,7 @@ function LandingPage() {
               return (
                 <div 
                   key={index} 
-                  className={`group relative bg-gradient-to-br backdrop-blur-sm p-8 rounded-2xl border-2 transition-all duration-500 hover:scale-105 ${
+                  className={`group relative bg-gradient-to-br p-8 rounded-2xl border-2 transition-all duration-500 hover:scale-105 ${
                     isPositive 
                       ? 'from-emerald-900/40 via-green-900/40 to-teal-900/40 border-emerald-500/40 hover:border-emerald-400/70 hover:shadow-2xl hover:shadow-emerald-500/30' 
                       : isNegative
@@ -905,14 +947,16 @@ function LandingPage() {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4 inline-block px-6 py-3 rounded-2xl" style={{
               textShadow: '0 0 40px rgba(0, 0, 0, 0.9), 0 4px 16px rgba(0, 0, 0, 1), 0 8px 32px rgba(0, 0, 0, 0.8)',
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
-              backdropFilter: 'blur(12px)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9))',
               border: '2px solid rgba(34, 211, 238, 0.3)'
             }}>
               {t.contact.title}
             </h2>
-            <p className="text-gray-300 text-lg mt-6 font-semibold" style={{
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.7)'
+            <br />
+            <p className="text-gray-300 text-lg mt-6 font-semibold inline-block px-6 py-3 rounded-xl" style={{
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.7)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85))',
+              border: '1px solid rgba(34, 211, 238, 0.2)'
             }}>
               {t.contact.subtitle}
             </p>
@@ -921,7 +965,7 @@ function LandingPage() {
           <ContactForm lang={lang} />
 
           <div className="grid md:grid-cols-3 gap-6 mt-12">
-            <div className="bg-slate-800/80 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/20 hover:border-cyan-500/50 transition hover:scale-105 duration-300">
+            <div className="bg-slate-800/80 p-6 rounded-xl border border-cyan-500/20 hover:border-cyan-500/50 transition hover:scale-105 duration-300">
               <Mail className="w-8 h-8 text-cyan-400 mb-3" />
               <h3 className="text-white font-semibold mb-2">{t.contact.email}</h3>
               <a href="mailto:your@email.com" className="text-gray-400 hover:text-cyan-400 break-all">
@@ -929,7 +973,7 @@ function LandingPage() {
               </a>
             </div>
 
-            <div className="bg-slate-800/80 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/20 hover:border-cyan-500/50 transition hover:scale-105 duration-300">
+            <div className="bg-slate-800/80 p-6 rounded-xl border border-cyan-500/20 hover:border-cyan-500/50 transition hover:scale-105 duration-300">
               <MessageSquare className="w-8 h-8 text-cyan-400 mb-3" />
               <h3 className="text-white font-semibold mb-2">{t.contact.telegram}</h3>
               <a href="https://t.me/yourusername" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-cyan-400">
@@ -937,7 +981,7 @@ function LandingPage() {
               </a>
             </div>
 
-            <div className="bg-slate-800/80 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/20 hover:border-cyan-500/50 transition hover:scale-105 duration-300">
+            <div className="bg-slate-800/80 p-6 rounded-xl border border-cyan-500/20 hover:border-cyan-500/50 transition hover:scale-105 duration-300">
               <Github className="w-8 h-8 text-cyan-400 mb-3" />
               <h3 className="text-white font-semibold mb-2">{t.contact.github}</h3>
               <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-cyan-400 break-all">
@@ -948,10 +992,10 @@ function LandingPage() {
         </div>
       </section>
       {/* FOOTER */}
-      <footer className="bg-gradient-to-b from-slate-900/80 to-slate-950/95 border-t border-cyan-500/20 pt-16 pb-8 px-4">
+      <footer className="bg-slate-900/95 border-t border-cyan-500/20 pt-8 pb-4 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Main Footer Content */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             {/* Brand Column */}
             <div className="md:col-span-1">
               <div className="flex items-center space-x-2 mb-4">
@@ -1064,7 +1108,7 @@ function LandingPage() {
           </div>
 
           {/* Divider */}
-          <div className="border-t border-cyan-500/20 pt-8">
+          <div className="border-t border-cyan-500/20 pt-4">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <p className="text-gray-400 text-sm text-center md:text-left">
                 © 2025 DevStudio. {lang === 'vi' ? 'Mọi quyền được bảo lưu.' : 'All rights reserved.'}
@@ -1082,7 +1126,7 @@ function LandingPage() {
           </div>
 
           {/* Bottom Text */}
-          <div className="text-center mt-6">
+          <div className="text-center mt-3">
             <p className="text-gray-500 text-xs">
               {lang === 'vi' 
                 ? '🌍 Phục vụ khách hàng toàn cầu - Việt Nam, USA, Europe, Asia' 

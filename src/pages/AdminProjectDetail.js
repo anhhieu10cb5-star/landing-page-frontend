@@ -29,7 +29,6 @@ function AdminProjectDetail() {
       }
     }
 
-    // Get ID from URL
     const pathParts = window.location.pathname.split('/');
     const id = pathParts[pathParts.length - 1];
     
@@ -42,7 +41,7 @@ function AdminProjectDetail() {
     console.log('🔍 Fetching project with ID:', id);
     
     try {
-      const response = await fetch(`http://localhost:5000/api/projects/${id}`, {
+      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/projects/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -76,12 +75,10 @@ function AdminProjectDetail() {
   };
 
   const handleEdit = () => {
-    // Navigate to edit page
     window.location.href = `/admin/projects/edit/${project._id}`;
   };
 
   const handleDelete = async () => {
-    // Confirm trước khi xóa
     const confirmDelete = window.confirm(
       `⚠️ Bạn có chắc muốn xóa dự án "${project.title}"?\n\nHành động này KHÔNG THỂ hoàn tác!`
     );
@@ -91,7 +88,7 @@ function AdminProjectDetail() {
     try {
       const token = localStorage.getItem('adminToken');
       
-      const response = await fetch(`http://localhost:5000/api/projects/${project._id}`, {
+      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/projects/${project._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -102,7 +99,6 @@ function AdminProjectDetail() {
 
       if (data.success) {
         alert('✅ Đã xóa dự án thành công!');
-        // Redirect về danh sách
         window.location.href = '/admin/projects';
       } else {
         alert('❌ Có lỗi xảy ra: ' + data.message);
@@ -487,4 +483,4 @@ function AdminProjectDetail() {
   );
 }
 
-export default AdminProjectDetail;
+export default AdminProjectDetail

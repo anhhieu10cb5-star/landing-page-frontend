@@ -34,7 +34,7 @@ function AdminProjects() {
     const token = localStorage.getItem('adminToken');
     
     try {
-      const response = await fetch('http://localhost:5000/api/projects', {
+      const response = await fetch('https://main-landing-page-backend-production.up.railway.app/api/projects', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

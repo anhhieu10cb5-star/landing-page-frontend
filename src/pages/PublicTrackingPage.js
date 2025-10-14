@@ -7,7 +7,6 @@ const PublicTrackingPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get project code from URL
   const projectCode = window.location.pathname.split('/track/')[1];
 
   useEffect(() => {
@@ -17,7 +16,7 @@ const PublicTrackingPage = () => {
   const fetchProject = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/projects/track/${projectCode}`);
+      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/projects/track/${projectCode}`);
       const data = await response.json();
 
       if (data.success) {

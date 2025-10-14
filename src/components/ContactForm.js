@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { Mail, User, Phone, MessageSquare, Send, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 
-// Initialize EmailJS
 emailjs.init('SB1AxaNwLXrfDBp2h');
 
 const ContactForm = ({ lang = 'vi' }) => {
@@ -86,7 +85,6 @@ const ContactForm = ({ lang = 'vi' }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
     if (!formData.from_name || !formData.from_email || !formData.message) {
       setStatus({
         loading: false,
@@ -110,9 +108,7 @@ const ContactForm = ({ lang = 'vi' }) => {
     setStatus({ loading: true, success: false, error: false, message: '' });
 
     try {
-      // 🚀 GỬI SONG SONG: EmailJS + Backend API
       const [emailResult, backendResult] = await Promise.all([
-        // 1. Gửi email qua EmailJS (như cũ)
         emailjs.send(
           'service_l8xvn6p',
           'template_i9qpo3a',
@@ -126,8 +122,7 @@ const ContactForm = ({ lang = 'vi' }) => {
           'SB1AxaNwLXrfDBp2h'
         ),
 
-        // 2. Lưu vào Database qua Backend API
-        fetch('http://localhost:5000/api/messages', {
+        fetch('https://main-landing-page-backend-production.up.railway.app/api/messages', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -147,7 +142,6 @@ const ContactForm = ({ lang = 'vi' }) => {
       console.log('✅ EmailJS sent:', emailResult);
       console.log('✅ Backend saved:', backendResult);
 
-      // Thành công
       setStatus({
         loading: false,
         success: true,
@@ -155,7 +149,6 @@ const ContactForm = ({ lang = 'vi' }) => {
         message: t.successMessage
       });
 
-      // Reset form
       setFormData({
         from_name: '',
         from_email: '',
@@ -163,7 +156,6 @@ const ContactForm = ({ lang = 'vi' }) => {
         message: ''
       });
 
-      // Auto hide success message sau 5s
       setTimeout(() => {
         setStatus({ loading: false, success: false, error: false, message: '' });
       }, 5000);
@@ -171,7 +163,6 @@ const ContactForm = ({ lang = 'vi' }) => {
     } catch (error) {
       console.error('❌ Error:', error);
       
-      // Kiểm tra lỗi từ đâu
       let errorMsg = t.errorMessage;
       if (error.message && error.message.includes('Backend')) {
         errorMsg = 'Email đã gửi nhưng không lưu được vào hệ thống. Vui lòng thử lại!';

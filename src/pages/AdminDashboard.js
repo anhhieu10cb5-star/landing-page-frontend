@@ -6,6 +6,7 @@ import {
   LayoutDashboard, MessageSquare, FolderKanban, LogOut, 
   Mail, CheckCircle, Clock, TrendingUp
 } from 'lucide-react';
+import { getApiUrl, API_ENDPOINTS } from '../config';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -20,7 +21,6 @@ const AdminDashboard = () => {
   const [adminData, setAdminData] = useState(null);
 
   useEffect(() => {
-    // Kiểm tra đăng nhập
     const token = localStorage.getItem('adminToken');
     const adminRaw = localStorage.getItem('adminData');
     
@@ -29,14 +29,13 @@ const AdminDashboard = () => {
       return;
     }
 
-    // Parse an toàn - tránh lỗi JSON
     if (adminRaw && adminRaw !== 'undefined' && adminRaw !== 'null') {
       try {
         const parsed = JSON.parse(adminRaw);
         setAdminData(parsed);
       } catch (err) {
         console.error('Invalid adminData JSON:', err);
-        localStorage.removeItem('adminData'); // Dọn rác nếu lỗi
+        localStorage.removeItem('adminData');
       }
     }
 
@@ -47,18 +46,14 @@ const AdminDashboard = () => {
     try {
       console.log('🔄 Fetching dashboard data...');
       
-      // Lấy thống kê messages
-      const statsResponse = await fetch('http://localhost:5000/api/messages/stats', {
+      const statsResponse = await fetch(getApiUrl(API_ENDPOINTS.MESSAGE_STATS), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
       if (!statsResponse.ok) {
-        // ✅ KHÔNG TỰ ĐỘNG LOGOUT - Chỉ log lỗi
         console.error('❌ Failed to fetch stats:', statsResponse.status);
-        
-        // Dùng data mặc định khi API lỗi
         setStats({
           totalMessages: 0,
           newMessages: 0,
@@ -73,7 +68,6 @@ const AdminDashboard = () => {
       const statsData = await statsResponse.json();
       console.log('✅ Stats data:', statsData);
       
-      // Parse data từ backend
       setStats({
         totalMessages: statsData.data.total || 0,
         newMessages: statsData.data.new || 0,
@@ -81,8 +75,7 @@ const AdminDashboard = () => {
         totalProjects: 0
       });
       
-      // Lấy tin nhắn gần đây
-      const messagesResponse = await fetch('http://localhost:5000/api/messages?limit=5', {
+      const messagesResponse = await fetch(getApiUrl(API_ENDPOINTS.MESSAGES) + '?limit=5', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -103,8 +96,6 @@ const AdminDashboard = () => {
 
     } catch (error) {
       console.error('❌ Error fetching dashboard data:', error);
-      
-      // Dùng data mặc định khi lỗi
       setStats({
         totalMessages: 0,
         newMessages: 0,
@@ -188,7 +179,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 flex">
-      {/* Sidebar */}
       <div className="w-64 bg-slate-900/95 backdrop-blur-sm border-r border-cyan-500/20 p-6 flex flex-col">
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-2">
@@ -247,16 +237,13 @@ const AdminDashboard = () => {
         </button>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
             <p className="text-gray-400">Tổng quan hệ thống</p>
           </div>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatCard
               icon={Mail}
@@ -285,7 +272,6 @@ const AdminDashboard = () => {
             />
           </div>
 
-          {/* Recent Messages */}
           <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl border border-cyan-500/20 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-white">Tin nhắn gần đây</h2>

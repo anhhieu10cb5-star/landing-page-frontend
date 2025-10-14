@@ -1,4 +1,4 @@
-// src/pages/AdminMessages.js - WITH REPLY FEATURE
+// src/pages/AdminMessages.js - COPY FILE NÀY
 import React, { useState, useEffect } from 'react';
 import { Mail, Search, Filter, Trash2, CheckCircle, Clock, AlertCircle, X, Send } from 'lucide-react';
 
@@ -26,7 +26,7 @@ const AdminMessages = () => {
       const token = localStorage.getItem('adminToken');
       console.log('🔑 Token:', token);
       
-      const response = await fetch('http://localhost:5000/api/messages', {
+      const response = await fetch('https://main-landing-page-backend-production.up.railway.app/api/messages', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -50,7 +50,6 @@ const AdminMessages = () => {
   const filterMessages = () => {
     let filtered = messages;
 
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(msg => 
         msg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -60,7 +59,6 @@ const AdminMessages = () => {
       );
     }
 
-    // Filter by status
     if (statusFilter !== 'all') {
       filtered = filtered.filter(msg => msg.status.toLowerCase() === statusFilter.toLowerCase());
     }
@@ -90,8 +88,7 @@ const AdminMessages = () => {
       setSending(true);
       const token = localStorage.getItem('adminToken');
       
-      // Gọi route POST /:id/reply thay vì PUT /:id
-      const response = await fetch(`http://localhost:5000/api/messages/${selectedMessage._id}/reply`, {
+      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/messages/${selectedMessage._id}/reply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,7 +104,7 @@ const AdminMessages = () => {
       if (data.success) {
         alert('✅ Reply đã được gửi thành công!');
         closeReplyModal();
-        fetchMessages(); // Reload messages
+        fetchMessages();
       } else {
         alert('❌ Có lỗi xảy ra: ' + data.message);
       }
@@ -124,7 +121,7 @@ const AdminMessages = () => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/messages/${id}`, {
+      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/messages/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -190,7 +187,6 @@ const AdminMessages = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-white p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 flex items-center">
             <Mail className="w-10 h-10 mr-3 text-cyan-400" />
@@ -199,7 +195,6 @@ const AdminMessages = () => {
           <p className="text-gray-400">Xem và trả lời tin nhắn từ khách hàng</p>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-slate-900/50 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/20">
             <div className="flex items-center justify-between">
@@ -248,10 +243,8 @@ const AdminMessages = () => {
           </div>
         </div>
 
-        {/* Filters */}
         <div className="bg-slate-900/50 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/20 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -263,7 +256,6 @@ const AdminMessages = () => {
               />
             </div>
 
-            {/* Status Filter */}
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <select
@@ -280,7 +272,6 @@ const AdminMessages = () => {
           </div>
         </div>
 
-        {/* Messages List */}
         <div className="space-y-4">
           {filteredMessages.length === 0 ? (
             <div className="text-center py-12 bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-700">
@@ -312,7 +303,6 @@ const AdminMessages = () => {
 
                 <p className="text-gray-300 mb-4 leading-relaxed">{message.message}</p>
 
-                {/* Reply Content (if replied) */}
                 {message.reply && (
                   <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
                     <p className="text-sm text-green-400 font-semibold mb-2">✅ Đã trả lời:</p>
@@ -320,7 +310,6 @@ const AdminMessages = () => {
                   </div>
                 )}
 
-                {/* Action Buttons */}
                 <div className="flex items-center space-x-3 mt-4 pt-4 border-t border-slate-700">
                   <button
                     onClick={() => openReplyModal(message)}
@@ -343,11 +332,9 @@ const AdminMessages = () => {
           )}
         </div>
 
-        {/* Reply Modal */}
         {replyModal && selectedMessage && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-slate-900 rounded-2xl border border-cyan-500/30 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              {/* Modal Header */}
               <div className="sticky top-0 bg-slate-900 border-b border-cyan-500/30 p-6 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white flex items-center">
                   <Send className="w-6 h-6 mr-3 text-cyan-400" />
@@ -361,9 +348,7 @@ const AdminMessages = () => {
                 </button>
               </div>
 
-              {/* Modal Body */}
               <div className="p-6">
-                {/* Original Message */}
                 <div className="mb-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
                   <p className="text-sm text-gray-400 mb-2">Tin nhắn gốc:</p>
                   <p className="text-white font-semibold mb-1">Từ: {selectedMessage.name} ({selectedMessage.email})</p>
@@ -371,7 +356,6 @@ const AdminMessages = () => {
                   <p className="text-gray-300">{selectedMessage.message}</p>
                 </div>
 
-                {/* Reply Textarea */}
                 <div className="mb-6">
                   <label className="block text-white font-semibold mb-2">Nội dung reply:</label>
                   <textarea
@@ -386,7 +370,6 @@ const AdminMessages = () => {
                   </p>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex items-center justify-end space-x-3">
                   <button
                     onClick={closeReplyModal}
