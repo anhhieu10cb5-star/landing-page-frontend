@@ -1,4 +1,4 @@
-// src/pages/AdminMessages.js - COPY FILE NÀY
+// src/pages/AdminMessages.js - ĐÃ SỬA BUG LOADING
 import React, { useState, useEffect } from 'react';
 import { Mail, Search, Filter, Trash2, CheckCircle, Clock, AlertCircle, X, Send } from 'lucide-react';
 
@@ -24,7 +24,6 @@ const AdminMessages = () => {
   const fetchMessages = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      console.log('🔑 Token:', token);
       
       const response = await fetch('https://main-landing-page-backend-production.up.railway.app/api/messages', {
         headers: {
@@ -32,12 +31,9 @@ const AdminMessages = () => {
         }
       });
       
-      console.log('📡 Response status:', response.status);
       const data = await response.json();
-      console.log('📦 Data received:', data);
       
       if (data.success) {
-        console.log('✅ Setting messages:', data.data);
         setMessages(data.data);
       }
     } catch (error) {
@@ -69,6 +65,7 @@ const AdminMessages = () => {
   const openReplyModal = (message) => {
     setSelectedMessage(message);
     setReplyText('');
+    setSending(false); // Reset sending state khi mở modal
     setReplyModal(true);
   };
 
@@ -76,6 +73,7 @@ const AdminMessages = () => {
     setReplyModal(false);
     setSelectedMessage(null);
     setReplyText('');
+    setSending(false); // Reset sending state khi đóng modal
   };
 
   const sendReply = async () => {
@@ -84,8 +82,9 @@ const AdminMessages = () => {
       return;
     }
 
+    setSending(true); // Bắt đầu loading
+
     try {
-      setSending(true);
       const token = localStorage.getItem('adminToken');
       
       const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/messages/${selectedMessage._id}/reply`, {
@@ -103,16 +102,17 @@ const AdminMessages = () => {
       
       if (data.success) {
         alert('✅ Reply đã được gửi thành công!');
+        setSending(false); // Tắt loading
         closeReplyModal();
         fetchMessages();
       } else {
         alert('❌ Có lỗi xảy ra: ' + data.message);
+        setSending(false); // Tắt loading khi lỗi
       }
     } catch (error) {
       console.error('Error sending reply:', error);
       alert('❌ Lỗi kết nối server!');
-    } finally {
-      setSending(false);
+      setSending(false); // Tắt loading khi lỗi
     }
   };
 
@@ -342,7 +342,8 @@ const AdminMessages = () => {
                 </h2>
                 <button
                   onClick={closeReplyModal}
-                  className="text-gray-400 hover:text-white transition"
+                  disabled={sending}
+                  className="text-gray-400 hover:text-white transition disabled:opacity-50"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -363,7 +364,8 @@ const AdminMessages = () => {
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder="Nhập nội dung trả lời tại đây..."
                     rows="8"
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 resize-none"
+                    disabled={sending}
+                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 resize-none disabled:opacity-50"
                   ></textarea>
                   <p className="text-sm text-gray-400 mt-2">
                     {replyText.length} ký tự
@@ -373,7 +375,8 @@ const AdminMessages = () => {
                 <div className="flex items-center justify-end space-x-3">
                   <button
                     onClick={closeReplyModal}
-                    className="px-6 py-3 bg-slate-800 text-gray-300 rounded-lg font-semibold hover:bg-slate-700 transition"
+                    disabled={sending}
+                    className="px-6 py-3 bg-slate-800 text-gray-300 rounded-lg font-semibold hover:bg-slate-700 transition disabled:opacity-50"
                   >
                     Hủy
                   </button>
