@@ -1,0 +1,160 @@
+/* src/styles/theme.css - Clean Theme (không override Tailwind) */
+
+:root {
+  /* Background Colors */
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #111111;
+  --bg-card: rgba(0, 0, 0, 0.8);
+  --bg-card-hover: rgba(0, 0, 0, 0.9);
+  
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #e5e5e5;
+  --text-muted: #a3a3a3;
+  --text-dim: #737373;
+  
+  /* Shadows */
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ============================================
+   COMPONENT STYLES
+   ============================================ */
+
+.card-dark {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card-dark:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.section-title {
+  text-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 4px 16px rgba(0, 0, 0, 1);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(10, 10, 10, 0.9));
+}
+
+.section-subtitle {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(10, 10, 10, 0.85));
+}
+
+.hero-title {
+  text-shadow: 0 0 30px rgba(0, 0, 0, 0.9), 0 4px 12px rgba(0, 0, 0, 1), 0 0 60px rgba(0, 0, 0, 0.7);
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.hero-subtitle {
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 1), 0 8px 16px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+.hero-description {
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 1), 0 0 30px rgba(0, 0, 0, 0.8);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(10, 10, 10, 0.9));
+}
+
+.input-dark {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* ============================================
+   SELECTION
+   ============================================ */
+
+::selection {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.8;
+    filter: brightness(1.2);
+  }
+}
+
+.neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* ============================================
+   BUTTON FOCUS FIX
+   ============================================ */
+
+button:focus {
+  outline: none !important;
+}
+
+a:focus {
+  outline: none !important;
+}
+
+input:focus {
+  outline: none !important;
+
+}
