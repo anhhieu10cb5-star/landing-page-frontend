@@ -554,7 +554,7 @@ export default function DevicePreviewDemo() {
           )}
         </div>
 
-        <div className="flex gap-8 justify-center">
+        <div className="flex gap-16 justify-center">
           {/* Left Panel - Options */}
           <div className="w-72 space-y-6 flex-shrink-0">
             {/* Device Selector */}
