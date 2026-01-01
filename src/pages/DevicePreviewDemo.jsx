@@ -132,16 +132,106 @@ const DeviceFrame = ({ device = 'iphone-15', children, scale = 1, label }) => {
 
 // ==================== UI PREVIEWS ====================
 
-// 1. Chat UI - Now with user prop for different views
+// 1. Chat UI - With Login
 const ChatPreview = ({ user = 'A', messages = [], onSendMessage }) => {
   const [inputValue, setInputValue] = useState('');
-  
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+  const [token, setToken] = useState('');
+
+  const API_URL = 'https://web-production-fd07d.up.railway.app/api';
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Vui lòng nhập email và mật khẩu');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Đăng nhập thất bại');
+      }
+
+      setCurrentUser(data.user);
+      setToken(data.access_token);
+      setIsLoggedIn(true);
+      console.log(`✅ Device ${user} logged in:`, data.user.username || data.user.email);
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Login Screen
+  if (!isLoggedIn) {
+    return (
+      <div className="h-full flex flex-col bg-gray-950 p-4 justify-center">
+        <div className="text-center mb-6">
+          <div className="text-4xl mb-2">🔐</div>
+          <h2 className="text-white text-lg font-bold">Đăng nhập</h2>
+          <p className="text-gray-400 text-xs mt-1">Device {user}</p>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-emerald-500"
+            />
+          </div>
+          <div>
+            <input
+              type="password"
+              placeholder="Mật khẩu"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          {error && (
+            <div className="text-red-400 text-xs text-center">{error}</div>
+          )}
+
+          <button
+            onClick={handleLogin}
+            disabled={isLoading}
+            className="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl disabled:opacity-50"
+          >
+            {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Chat Screen (sau khi login)
   const userInfo = {
     A: { name: 'User A', avatar: '🅰️', color: 'from-emerald-400 to-cyan-500' },
     B: { name: 'User B', avatar: '🅱️', color: 'from-purple-400 to-pink-500' },
   };
-  
-  const currentUser = userInfo[user];
+
   const otherUser = userInfo[user === 'A' ? 'B' : 'A'];
 
   const handleSend = () => {
@@ -151,35 +241,38 @@ const ChatPreview = ({ user = 'A', messages = [], onSendMessage }) => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSend();
-    }
-  };
-
   return (
     <div className="h-full flex flex-col bg-gray-950">
-      <div className="bg-gray-900 px-4 py-3 flex items-center gap-3 border-b border-gray-800">
-        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${otherUser.color} flex items-center justify-center text-lg`}>
-          {otherUser.avatar}
+      {/* Header - Show logged in user */}
+      <div className="bg-gray-900 px-4 py-3 flex items-center justify-between border-b border-gray-800">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${otherUser.color} flex items-center justify-center text-lg`}>
+            {otherUser.avatar}
+          </div>
+          <div>
+            <div className="text-white font-semibold text-sm">{otherUser.name}</div>
+            <div className="text-emerald-400 text-xs">Online</div>
+          </div>
         </div>
-        <div>
-          <div className="text-white font-semibold text-sm">{otherUser.name}</div>
-          <div className="text-emerald-400 text-xs">Online</div>
+        <div className="text-right">
+          <div className="text-gray-400 text-xs">{currentUser?.username || currentUser?.email}</div>
+          <div className="text-emerald-400 text-xs">● Đã kết nối</div>
         </div>
       </div>
-      
+
+      {/* Messages */}
       <div className="flex-1 p-4 space-y-3 overflow-auto">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 text-sm mt-8">
-            Bắt đầu cuộc trò chuyện...
+            ✅ Đăng nhập thành công!<br/>
+            Chờ bước tiếp theo...
           </div>
         ) : (
           messages.map((msg, index) => (
             <div key={index} className={`flex ${msg.from === user ? 'justify-end' : 'justify-start'}`}>
               <div className={`px-4 py-2 rounded-2xl max-w-[80%] text-sm ${
-                msg.from === user 
-                  ? 'bg-emerald-600 text-white rounded-br-md' 
+                msg.from === user
+                  ? 'bg-emerald-600 text-white rounded-br-md'
                   : 'bg-gray-800 text-white rounded-bl-md'
               }`}>
                 {msg.text}
@@ -188,18 +281,19 @@ const ChatPreview = ({ user = 'A', messages = [], onSendMessage }) => {
           ))
         )}
       </div>
-      
+
+      {/* Input */}
       <div className="p-3 border-t border-gray-800">
         <div className="flex items-center gap-2 bg-gray-800 rounded-full px-4 py-2">
-          <input 
-            type="text" 
-            placeholder="Nhập tin nhắn..." 
+          <input
+            type="text"
+            placeholder="Nhập tin nhắn..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             className="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-500"
           />
-          <button 
+          <button
             onClick={handleSend}
             className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center hover:bg-emerald-600 transition-colors"
           >
