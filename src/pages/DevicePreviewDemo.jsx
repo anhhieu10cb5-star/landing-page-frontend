@@ -622,7 +622,7 @@ export default function DevicePreviewDemo() {
             {/* Device A */}
             <DeviceFrame 
               device={selectedDevice} 
-              scale={0.85}
+              scale={1.1}
               label={isDualDeviceUI ? "User A" : null}
             >
               {renderPreview('A')}
@@ -632,7 +632,7 @@ export default function DevicePreviewDemo() {
             {isDualDeviceUI && (
               <DeviceFrame 
                 device={selectedDevice} 
-                scale={0.85}
+                scale={1.1}
                 label="User B"
               >
                 {renderPreview('B')}
