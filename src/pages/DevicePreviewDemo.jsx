@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // Device Frame Component
-const DeviceFrame = ({ device = 'iphone-15', children, scale = 1 }) => {
+const DeviceFrame = ({ device = 'iphone-15', children, scale = 1, label }) => {
   const devices = {
     'iphone-15': {
       name: 'iPhone 15 Pro',
@@ -48,6 +48,13 @@ const DeviceFrame = ({ device = 'iphone-15', children, scale = 1 }) => {
         transformOrigin: 'top center'
       }}
     >
+      {/* Device Label */}
+      {label && (
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-emerald-500/20 text-emerald-400 px-4 py-1 rounded-full text-sm font-medium whitespace-nowrap">
+          {label}
+        </div>
+      )}
+      
       {/* Device outer frame */}
       <div
         className="relative bg-gradient-to-b from-gray-800 via-gray-900 to-black p-3 shadow-2xl"
@@ -125,51 +132,86 @@ const DeviceFrame = ({ device = 'iphone-15', children, scale = 1 }) => {
 
 // ==================== UI PREVIEWS ====================
 
-// 1. Chat UI
-const ChatPreview = () => (
-  <div className="h-full flex flex-col bg-gray-950">
-    <div className="bg-gray-900 px-4 py-3 flex items-center gap-3 border-b border-gray-800">
-      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500" />
-      <div>
-        <div className="text-white font-semibold text-sm">GnodChat</div>
-        <div className="text-emerald-400 text-xs">Online</div>
-      </div>
-    </div>
-    
-    <div className="flex-1 p-4 space-y-3 overflow-auto">
-      <div className="flex justify-start">
-        <div className="bg-gray-800 text-white px-4 py-2 rounded-2xl rounded-bl-md max-w-[80%] text-sm">
-          Xin chào! 👋
+// 1. Chat UI - Now with user prop for different views
+const ChatPreview = ({ user = 'A', messages = [], onSendMessage }) => {
+  const [inputValue, setInputValue] = useState('');
+  
+  const userInfo = {
+    A: { name: 'User A', avatar: '🅰️', color: 'from-emerald-400 to-cyan-500' },
+    B: { name: 'User B', avatar: '🅱️', color: 'from-purple-400 to-pink-500' },
+  };
+  
+  const currentUser = userInfo[user];
+  const otherUser = userInfo[user === 'A' ? 'B' : 'A'];
+
+  const handleSend = () => {
+    if (inputValue.trim() && onSendMessage) {
+      onSendMessage(user, inputValue.trim());
+      setInputValue('');
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSend();
+    }
+  };
+
+  return (
+    <div className="h-full flex flex-col bg-gray-950">
+      <div className="bg-gray-900 px-4 py-3 flex items-center gap-3 border-b border-gray-800">
+        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${otherUser.color} flex items-center justify-center text-lg`}>
+          {otherUser.avatar}
+        </div>
+        <div>
+          <div className="text-white font-semibold text-sm">{otherUser.name}</div>
+          <div className="text-emerald-400 text-xs">Online</div>
         </div>
       </div>
-      <div className="flex justify-end">
-        <div className="bg-emerald-600 text-white px-4 py-2 rounded-2xl rounded-br-md max-w-[80%] text-sm">
-          Hello! Tôi muốn test SDK
-        </div>
+      
+      <div className="flex-1 p-4 space-y-3 overflow-auto">
+        {messages.length === 0 ? (
+          <div className="text-center text-gray-500 text-sm mt-8">
+            Bắt đầu cuộc trò chuyện...
+          </div>
+        ) : (
+          messages.map((msg, index) => (
+            <div key={index} className={`flex ${msg.from === user ? 'justify-end' : 'justify-start'}`}>
+              <div className={`px-4 py-2 rounded-2xl max-w-[80%] text-sm ${
+                msg.from === user 
+                  ? 'bg-emerald-600 text-white rounded-br-md' 
+                  : 'bg-gray-800 text-white rounded-bl-md'
+              }`}>
+                {msg.text}
+              </div>
+            </div>
+          ))
+        )}
       </div>
-      <div className="flex justify-start">
-        <div className="bg-gray-800 text-white px-4 py-2 rounded-2xl rounded-bl-md max-w-[80%] text-sm">
-          Tuyệt vời! SDK đã sẵn sàng 🚀
+      
+      <div className="p-3 border-t border-gray-800">
+        <div className="flex items-center gap-2 bg-gray-800 rounded-full px-4 py-2">
+          <input 
+            type="text" 
+            placeholder="Nhập tin nhắn..." 
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-500"
+          />
+          <button 
+            onClick={handleSend}
+            className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center hover:bg-emerald-600 transition-colors"
+          >
+            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
-    
-    <div className="p-3 border-t border-gray-800">
-      <div className="flex items-center gap-2 bg-gray-800 rounded-full px-4 py-2">
-        <input 
-          type="text" 
-          placeholder="Nhập tin nhắn..." 
-          className="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-500"
-        />
-        <button className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
-          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 // 2. E-Commerce UI
 const EcommercePreview = () => (
@@ -454,6 +496,7 @@ const MusicPreview = () => (
 export default function DevicePreviewDemo() {
   const [selectedDevice, setSelectedDevice] = useState('iphone-15');
   const [selectedUI, setSelectedUI] = useState('chat');
+  const [messages, setMessages] = useState([]);
 
   const deviceOptions = [
     { id: 'iphone-15', name: 'iPhone 15 Pro', icon: '📱' },
@@ -471,17 +514,26 @@ export default function DevicePreviewDemo() {
     { id: 'music', name: 'Music Player', icon: '🎵', desc: 'Trình phát nhạc' },
   ];
 
-  const renderPreview = () => {
+  // Handle sending message from either device
+  const handleSendMessage = (from, text) => {
+    setMessages(prev => [...prev, { from, text, timestamp: Date.now() }]);
+  };
+
+  const renderPreview = (user = 'A') => {
     switch (selectedUI) {
-      case 'chat': return <ChatPreview />;
+      case 'chat': 
+        return <ChatPreview user={user} messages={messages} onSendMessage={handleSendMessage} />;
       case 'ecommerce': return <EcommercePreview />;
       case 'login': return <LoginPreview />;
       case 'dashboard': return <DashboardPreview />;
       case 'social': return <SocialPreview />;
       case 'music': return <MusicPreview />;
-      default: return <ChatPreview />;
+      default: return <ChatPreview user={user} messages={messages} onSendMessage={handleSendMessage} />;
     }
   };
+
+  // Check if current UI supports dual device
+  const isDualDeviceUI = selectedUI === 'chat';
 
   return (
     <div className="min-h-screen bg-black p-8">
@@ -492,11 +544,19 @@ export default function DevicePreviewDemo() {
             Gnod<span className="text-emerald-400">Cloud</span> Studio
           </h1>
           <p className="text-gray-400">Chọn thiết bị và UI template để xem preview trực tiếp</p>
+          
+          {/* Live Preview Badge */}
+          {isDualDeviceUI && (
+            <div className="inline-flex items-center gap-2 mt-4 bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-full">
+              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+              Live Preview - Chat qua lại giữa 2 thiết bị
+            </div>
+          )}
         </div>
 
-        <div className="flex gap-16 justify-between max-w-6xl mx-auto">
+        <div className="flex gap-8 justify-center">
           {/* Left Panel - Options */}
-          <div className="w-80 space-y-6">
+          <div className="w-72 space-y-6 flex-shrink-0">
             {/* Device Selector */}
             <div className="bg-gray-900/50 rounded-2xl p-5 border border-gray-800">
               <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
@@ -529,7 +589,10 @@ export default function DevicePreviewDemo() {
                 {uiOptions.map((ui) => (
                   <button
                     key={ui.id}
-                    onClick={() => setSelectedUI(ui.id)}
+                    onClick={() => {
+                      setSelectedUI(ui.id);
+                      setMessages([]); // Reset messages when switching UI
+                    }}
                     className={`w-full text-left px-4 py-3 rounded-xl transition-all ${
                       selectedUI === ui.id
                         ? 'bg-emerald-500/20 border-2 border-emerald-500 text-emerald-400'
@@ -555,12 +618,35 @@ export default function DevicePreviewDemo() {
           </div>
 
           {/* Right Panel - Device Preview */}
-          <div className="flex items-start justify-center">
-            <DeviceFrame device={selectedDevice} scale={1.2}>
-              {renderPreview()}
+          <div className="flex items-start gap-8">
+            {/* Device A */}
+            <DeviceFrame 
+              device={selectedDevice} 
+              scale={0.85}
+              label={isDualDeviceUI ? "User A" : null}
+            >
+              {renderPreview('A')}
             </DeviceFrame>
+
+            {/* Device B - Only show for dual-device UIs */}
+            {isDualDeviceUI && (
+              <DeviceFrame 
+                device={selectedDevice} 
+                scale={0.85}
+                label="User B"
+              >
+                {renderPreview('B')}
+              </DeviceFrame>
+            )}
           </div>
         </div>
+
+        {/* Instructions for Chat */}
+        {isDualDeviceUI && (
+          <div className="text-center mt-8 text-gray-500 text-sm">
+            💡 Gõ tin nhắn ở một thiết bị và xem nó hiện trên thiết bị kia
+          </div>
+        )}
       </div>
     </div>
   );
