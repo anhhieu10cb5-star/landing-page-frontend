@@ -1,6 +1,6 @@
 // src/pages/PublicTrackingPage.js
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, Clock, Circle, ArrowLeft, Calendar, DollarSign, Code as CodeIcon, FileText, ExternalLink } from 'lucide-react';
+import { CheckCircle, Clock, Circle, ArrowLeft, Calendar, DollarSign, Code as CodeIcon, FileText, ExternalLink, Image } from 'lucide-react';
 
 const PublicTrackingPage = () => {
   const [project, setProject] = useState(null);
@@ -74,11 +74,11 @@ const PublicTrackingPage = () => {
 
   const formatStatus = (status) => {
     const statusMap = {
-      'in-progress': 'In Progress',
-      'on-hold': 'On Hold',
-      'pending': 'Pending',
-      'completed': 'Completed',
-      'cancelled': 'Cancelled'
+      'in-progress': 'Đang thực hiện',
+      'on-hold': 'Tạm dừng',
+      'pending': 'Chờ xử lý',
+      'completed': 'Hoàn thành',
+      'cancelled': 'Đã hủy'
     };
     return statusMap[status.toLowerCase()] || status;
   };
@@ -269,22 +269,26 @@ const PublicTrackingPage = () => {
                 </div>
               </div>
             )}
-          </div>
 
-          
-             {/* Screenshots - Hình ảnh tiến độ */}
+            {/* Screenshots - Hình ảnh tiến độ */}
             {project.screenshots && project.screenshots.length > 0 && (
               <div className="bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-cyan-500/20 p-6">
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                   <div className="w-2 h-8 bg-gradient-to-b from-indigo-400 to-purple-600 rounded-full mr-3"></div>
+                  <Image className="w-6 h-6 mr-2 text-indigo-400" />
                   Hình ảnh tiến độ
                 </h2>
                 
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {Object.entries(
                     project.screenshots.reduce((groups, img) => {
                       const date = img.uploadedAt 
-                        ? new Date(img.uploadedAt).toLocaleDateString('vi-VN') 
+                        ? new Date(img.uploadedAt).toLocaleDateString('vi-VN', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })
                         : 'Không rõ ngày';
                       if (!groups[date]) groups[date] = [];
                       groups[date].push(img);
@@ -297,28 +301,35 @@ const PublicTrackingPage = () => {
                     return dateB - dateA;
                   })
                   .map(([date, images]) => (
-                    <div key={date}>
-                      <div className="flex items-center space-x-2 mb-3">
-                        <Calendar className="w-4 h-4 text-indigo-400" />
-                        <span className="text-sm font-semibold text-gray-300">{date}</span>
-                        <span className="text-xs text-gray-500">({images.length} ảnh)</span>
+                    <div key={date} className="border-l-4 border-indigo-500 pl-4">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <Calendar className="w-5 h-5 text-indigo-400" />
+                        <span className="text-lg font-semibold text-white">{date}</span>
+                        <span className="text-sm text-gray-400 bg-slate-800 px-3 py-1 rounded-full">{images.length} ảnh</span>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {images.map((img, index) => (
-                          <div 
-                            key={index} 
-                            className="relative group cursor-pointer"
-                            onClick={() => window.open(img.url, '_blank')}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {images.map((img, imgIndex) => (
+                          <a
+                            key={imgIndex}
+                            href={img.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block group"
                           >
-                            <img 
-                              src={img.url} 
-                              alt={img.name} 
-                              className="w-full h-32 object-cover rounded-lg border border-slate-700 hover:border-cyan-500/50 transition"
-                            />
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center">
-                              <ExternalLink className="w-6 h-6 text-white" />
+                            <div className="relative overflow-hidden rounded-xl border-2 border-slate-700 hover:border-cyan-500 transition-all duration-300">
+                              <img 
+                                src={img.url} 
+                                alt={img.name || `Screenshot ${imgIndex + 1}`}
+                                className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                                <span className="text-white font-medium flex items-center space-x-2 bg-cyan-500/80 px-4 py-2 rounded-lg">
+                                  <ExternalLink className="w-4 h-4" />
+                                  <span>Xem ảnh gốc</span>
+                                </span>
+                              </div>
                             </div>
-                          </div>
+                          </a>
                         ))}
                       </div>
                     </div>
@@ -326,8 +337,9 @@ const PublicTrackingPage = () => {
                 </div>
               </div>
             )}
-          
-          
+
+          </div>
+
           {/* Right Column - Project Details */}
           <div className="space-y-6">
             
@@ -395,12 +407,13 @@ const PublicTrackingPage = () => {
               </div>
             )}
           </div>
+
         </div>
 
         {/* Footer Note */}
         <div className="mt-12 text-center">
           <p className="text-gray-500 text-sm">
-            Trang này được cập nhật tự động mỗi ngày. Nếu có thắc mắc, vui lòng liên hệ qua email: <span className="text-cyan-400">{project.clientEmail}</span>
+            Trang này được cập nhật tự động. Nếu có thắc mắc, vui lòng liên hệ qua email: <span className="text-cyan-400">{project.clientEmail}</span>
           </p>
         </div>
       </main>
