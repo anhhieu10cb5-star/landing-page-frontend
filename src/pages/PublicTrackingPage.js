@@ -271,6 +271,63 @@ const PublicTrackingPage = () => {
             )}
           </div>
 
+          
+             {/* Screenshots - Hình ảnh tiến độ */}
+            {project.screenshots && project.screenshots.length > 0 && (
+              <div className="bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-cyan-500/20 p-6">
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
+                  <div className="w-2 h-8 bg-gradient-to-b from-indigo-400 to-purple-600 rounded-full mr-3"></div>
+                  Hình ảnh tiến độ
+                </h2>
+                
+                <div className="space-y-6">
+                  {Object.entries(
+                    project.screenshots.reduce((groups, img) => {
+                      const date = img.uploadedAt 
+                        ? new Date(img.uploadedAt).toLocaleDateString('vi-VN') 
+                        : 'Không rõ ngày';
+                      if (!groups[date]) groups[date] = [];
+                      groups[date].push(img);
+                      return groups;
+                    }, {})
+                  )
+                  .sort((a, b) => {
+                    const dateA = new Date(a[1][0]?.uploadedAt || 0);
+                    const dateB = new Date(b[1][0]?.uploadedAt || 0);
+                    return dateB - dateA;
+                  })
+                  .map(([date, images]) => (
+                    <div key={date}>
+                      <div className="flex items-center space-x-2 mb-3">
+                        <Calendar className="w-4 h-4 text-indigo-400" />
+                        <span className="text-sm font-semibold text-gray-300">{date}</span>
+                        <span className="text-xs text-gray-500">({images.length} ảnh)</span>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {images.map((img, index) => (
+                          <div 
+                            key={index} 
+                            className="relative group cursor-pointer"
+                            onClick={() => window.open(img.url, '_blank')}
+                          >
+                            <img 
+                              src={img.url} 
+                              alt={img.name} 
+                              className="w-full h-32 object-cover rounded-lg border border-slate-700 hover:border-cyan-500/50 transition"
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center">
+                              <ExternalLink className="w-6 h-6 text-white" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          
+          
           {/* Right Column - Project Details */}
           <div className="space-y-6">
             
