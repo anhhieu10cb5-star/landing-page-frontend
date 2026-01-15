@@ -632,17 +632,17 @@ const removeScreenshot = (index) => {
                     Loại dự án
                   </label>
                   <select
-                    name="status"
-                    value={formData.status}
+                    name="type"
+                    value={formData.type}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="Pending">Chờ xử lý</option>
-                    <option value="In Progress">Đang thực hiện</option>
-                    <option value="Review">Đang review</option>
-                    <option value="Completed">Hoàn thành</option>
-                    <option value="On Hold">Tạm dừng</option>
-                    <option value="Cancelled">Đã hủy</option>
+                    <option value="Website">Website</option>
+                    <option value="Mobile App">Mobile App</option>
+                    <option value="Web App">Web App</option>
+                    <option value="E-Commerce">E-Commerce</option>
+                    <option value="Landing Page">Landing Page</option>
+                    <option value="Backend API">Backend API</option>
                   </select>
                 </div>
 
@@ -656,10 +656,12 @@ const removeScreenshot = (index) => {
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="On Hold">On Hold</option>
+                    <option value="Pending">Chờ xử lý</option>
+                    <option value="In Progress">Đang thực hiện</option>
+                    <option value="Review">Đang review</option>
+                    <option value="Completed">Hoàn thành</option>
+                    <option value="On Hold">Tạm dừng</option>
+                    <option value="Cancelled">Đã hủy</option>
                   </select>
                 </div>
 
