@@ -133,7 +133,8 @@ const DeviceFrame = ({ device = 'iphone-15', children, scale = 1, label }) => {
 // ==================== UI PREVIEWS ====================
 
 // 1. Chat UI - With Login
-const ChatPreview = ({ user = 'A', messages = [], onSendMessage }) => {
+// 1. Chat UI - With Login + WebSocket + Conversations
+const ChatPreview = ({ user = 'A' }) => {
   const [inputValue, setInputValue] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -142,9 +143,26 @@ const ChatPreview = ({ user = 'A', messages = [], onSendMessage }) => {
   const [password, setPassword] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useState('');
+  const [conversations, setConversations] = useState([]);
+  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const [otherUser, setOtherUser] = useState(null);
+  const messagesEndRef = React.useRef(null);
 
-  const API_URL = 'https://web-production-fd07d.up.railway.app/api';
+  const API_URL = 'http://localhost:4000/api';
+  const WS_URL = 'http://localhost:4000';
 
+  // Auto scroll to bottom
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  React.useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Login handler
   const handleLogin = async () => {
     if (!email || !password) {
       setError('Vui lòng nhập email và mật khẩu');
@@ -172,12 +190,168 @@ const ChatPreview = ({ user = 'A', messages = [], onSendMessage }) => {
       setIsLoggedIn(true);
       console.log(`✅ Device ${user} logged in:`, data.user.username || data.user.email);
 
+      // Fetch conversations
+      await fetchConversations(data.access_token);
+
+      // Connect WebSocket
+      connectWebSocket(data.user.id);
+
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Fetch conversations
+  const fetchConversations = async (accessToken) => {
+    try {
+      const response = await fetch(`${API_URL}/messages/conversations`, {
+        headers: { 
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+      });
+
+      if (!response.ok) throw new Error('Không thể lấy conversations');
+
+      const data = await response.json();
+      console.log(`📋 Device ${user} conversations:`, data);
+      setConversations(data);
+
+    } catch (err) {
+      console.error('Error fetching conversations:', err);
+    }
+  };
+
+  // Connect WebSocket
+  const connectWebSocket = (userId) => {
+    const { io } = require('socket.io-client');
+    
+    const newSocket = io(`${WS_URL}/messages`, {
+      transports: ['websocket'],
+      autoConnect: true,
+    });
+
+    newSocket.on('connect', () => {
+      console.log(`🔌 Device ${user} WebSocket connected`);
+      newSocket.emit('register', { userId });
+    });
+
+    newSocket.on('registered', (data) => {
+      console.log(`✅ Device ${user} registered:`, data);
+    });
+
+    newSocket.on('newMessage', (message) => {
+    console.log(`📨 Device ${user} received:`, message);
+    // Chỉ thêm nếu message thuộc conversation đang mở
+    setMessages(prev => {
+      // Tránh duplicate
+      if (prev.some(m => m.id === message.id)) return prev;
+      return [...prev, message];
+    });
+  });
+
+    newSocket.on('messageSent', (message) => {
+      console.log(`✅ Device ${user} message sent:`, message);
+      setMessages(prev => {
+        // Tránh duplicate
+        if (prev.some(m => m.id === message.id)) return prev;
+        return [...prev, message];
+      });
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log(`❌ Device ${user} WebSocket disconnected`);
+    });
+
+    setSocket(newSocket);
+  };
+
+  // Select conversation
+  const selectConversation = async (conv) => {
+    // Nếu chọn lại cùng conversation, chỉ quay về chat screen
+    if (selectedConversation?.id === conv.id) {
+      return;  // Giữ nguyên messages, không fetch lại
+    }
+    
+    setSelectedConversation(conv);
+    setMessages([]);  // Clear messages cũ của conversation khác
+    
+    // Find other user in conversation
+    const other = conv.participants?.find(p => p.id !== currentUser.id);
+      console.log('👤 Other participant:', other);
+      // other có thể là {userId, user: {...}} hoặc trực tiếp là user object
+      setOtherUser({
+        id: other?.id,
+        username: other?.firstName || other?.username || 'Unknown',
+        avatar: other?.avatar,
+      });
+
+    // Fetch messages
+    try {
+      const response = await fetch(`${API_URL}/messages/conversations/${conv.id}`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📩 Raw API response:', data);
+        
+        let messagesArray = Array.isArray(data) ? data : (data.messages || data.data || []);
+        
+        // API trả về mới nhất trước, reverse để cũ lên đầu
+        const sortedMessages = messagesArray.sort((a, b) => 
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        
+        setMessages(sortedMessages);
+        console.log('📩 Messages set:', sortedMessages.length, 'Latest:', sortedMessages[sortedMessages.length - 1]?.content);
+      }
+    } catch (err) {
+      console.error('Error fetching messages:', err);
+    }
+
+    // Join conversation room
+    if (socket) {
+      socket.emit('joinConversation', { conversationId: conv.id });
+    }
+  };
+
+  // Send message
+  const handleSend = () => {
+    if (!inputValue.trim() || !socket || !selectedConversation) return;
+
+    // Tìm receiverId đúng cách
+    const otherParticipant = selectedConversation.participants?.find(p => p.id !== currentUser.id);
+    const receiverId = otherUser?.id || otherParticipant?.id;
+
+    const messageData = {
+      senderId: currentUser.id,
+      receiverId: receiverId,
+      conversationId: selectedConversation.id,
+      content: inputValue.trim(),
+    };
+
+    console.log(`📤 Device ${user} sending:`, messageData);
+    
+    if (!receiverId) {
+      console.error('❌ receiverId is undefined!');
+      return;
+    }
+
+    console.log(`📤 Device ${user} sending:`, messageData);
+    socket.emit('sendMessage', messageData);
+
+
+
+    setInputValue('');
+  };
+
+  // === RENDER ===
 
   // Login Screen
   if (!isLoggedIn) {
@@ -190,25 +364,21 @@ const ChatPreview = ({ user = 'A', messages = [], onSendMessage }) => {
         </div>
 
         <div className="space-y-3">
-          <div>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-emerald-500"
-            />
-          </div>
-          <div>
-            <input
-              type="password"
-              placeholder="Mật khẩu"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-emerald-500"
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-emerald-500"
+          />
+          <input
+            type="password"
+            placeholder="Mật khẩu"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+            className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-emerald-500"
+          />
 
           {error && (
             <div className="text-red-400 text-xs text-center">{error}</div>
@@ -226,60 +396,84 @@ const ChatPreview = ({ user = 'A', messages = [], onSendMessage }) => {
     );
   }
 
-  // Chat Screen (sau khi login)
-  const userInfo = {
-    A: { name: 'User A', avatar: '🅰️', color: 'from-emerald-400 to-cyan-500' },
-    B: { name: 'User B', avatar: '🅱️', color: 'from-purple-400 to-pink-500' },
-  };
+  // Conversation List Screen
+  if (!selectedConversation) {
+    return (
+      <div className="h-full flex flex-col bg-gray-950">
+        <div className="bg-gray-900 px-4 py-3 border-b border-gray-800">
+          <div className="text-white font-semibold">💬 Conversations</div>
+          <div className="text-emerald-400 text-xs">{currentUser?.username || currentUser?.email}</div>
+        </div>
 
-  const otherUser = userInfo[user === 'A' ? 'B' : 'A'];
+        <div className="flex-1 overflow-auto">
+          {conversations.length === 0 ? (
+            <div className="text-center text-gray-500 text-sm mt-8">
+              Không có conversation nào
+            </div>
+          ) : (
+            conversations.map((conv) => {
+              const other = conv.participants?.find(p => p.id !== currentUser.id);
+              return (
+                <div
+                  key={conv.id}
+                  onClick={() => selectConversation(conv)}
+                  className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 hover:bg-gray-900 cursor-pointer"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white font-bold">
+                    {other?.firstName?.[0]?.toUpperCase() || other?.username?.[0]?.toUpperCase() || '?'}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-white text-sm font-medium">
+                      {other?.firstName || other?.username || 'Unknown'}
+                    </div>
+                    <div className="text-gray-500 text-xs truncate">
+                      {conv.lastMessage?.content || 'Chưa có tin nhắn'}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    );
+  }
 
-  const handleSend = () => {
-    if (inputValue.trim() && onSendMessage) {
-      onSendMessage(user, inputValue.trim());
-      setInputValue('');
-    }
-  };
-
+  // Chat Screen
   return (
     <div className="h-full flex flex-col bg-gray-950">
-      {/* Header - Show logged in user */}
-      <div className="bg-gray-900 px-4 py-3 flex items-center justify-between border-b border-gray-800">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${otherUser.color} flex items-center justify-center text-lg`}>
-            {otherUser.avatar}
-          </div>
-          <div>
-            <div className="text-white font-semibold text-sm">{otherUser.name}</div>
-            <div className="text-emerald-400 text-xs">Online</div>
-          </div>
+      {/* Header */}
+      <div className="bg-gray-900 px-4 py-3 flex items-center gap-3 border-b border-gray-800">
+        <button 
+          onClick={() => setSelectedConversation(null)}
+          className="text-gray-400 hover:text-white"
+        >
+          ←
+        </button>
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white text-sm font-bold">
+          {otherUser?.username?.[0]?.toUpperCase() || '?'}
         </div>
-        <div className="text-right">
-          <div className="text-gray-400 text-xs">{currentUser?.username || currentUser?.email}</div>
-          <div className="text-emerald-400 text-xs">● Đã kết nối</div>
+        <div>
+          <div className="text-white font-semibold text-sm">{otherUser?.username || 'Unknown'}</div>
+          <div className="text-emerald-400 text-xs">Online</div>
         </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 p-4 space-y-3 overflow-auto">
-        {messages.length === 0 ? (
-          <div className="text-center text-gray-500 text-sm mt-8">
-            ✅ Đăng nhập thành công!<br/>
-            Chờ bước tiếp theo...
-          </div>
-        ) : (
-          messages.map((msg, index) => (
-            <div key={index} className={`flex ${msg.from === user ? 'justify-end' : 'justify-start'}`}>
-              <div className={`px-4 py-2 rounded-2xl max-w-[80%] text-sm ${
-                msg.from === user
-                  ? 'bg-emerald-600 text-white rounded-br-md'
-                  : 'bg-gray-800 text-white rounded-bl-md'
-              }`}>
-                {msg.text}
-              </div>
+        {console.log('🎨 Rendering messages:', messages.length)}
+        {messages.map((msg, index) => (
+          <div key={msg.id || index} className={`flex ${msg.senderId === currentUser.id ? 'justify-end' : 'justify-start'}`}>
+            <div className={`px-4 py-2 rounded-2xl max-w-[80%] text-sm ${
+              msg.senderId === currentUser.id
+                ? 'bg-emerald-600 text-white rounded-br-md'
+                : 'bg-gray-800 text-white rounded-bl-md'
+            }`}>
+              {msg.content}
             </div>
-          ))
-        )}
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
@@ -295,7 +489,7 @@ const ChatPreview = ({ user = 'A', messages = [], onSendMessage }) => {
           />
           <button
             onClick={handleSend}
-            className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center hover:bg-emerald-600 transition-colors"
+            className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center hover:bg-emerald-600"
           >
             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -616,7 +810,7 @@ export default function DevicePreviewDemo() {
   const renderPreview = (user = 'A') => {
     switch (selectedUI) {
       case 'chat': 
-        return <ChatPreview user={user} messages={messages} onSendMessage={handleSendMessage} />;
+        return <ChatPreview key={`chat-${user}`} user={user} />;
       case 'ecommerce': return <EcommercePreview />;
       case 'login': return <LoginPreview />;
       case 'dashboard': return <DashboardPreview />;
