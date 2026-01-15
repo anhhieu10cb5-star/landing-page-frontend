@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, MessageSquare, FolderKanban, LogOut, 
-  Mail, CheckCircle, Clock, TrendingUp
+  Mail, CheckCircle, Clock, TrendingUp, DollarSign
 } from 'lucide-react';
 import { getApiUrl, API_ENDPOINTS } from '../config';
 
@@ -13,7 +13,8 @@ const AdminDashboard = () => {
     totalMessages: 0,
     newMessages: 0,
     repliedMessages: 0,
-    totalProjects: 0
+    totalProjects: 0,
+    totalValue: 0 // THÊM MỚI
   });
   const [recentMessages, setRecentMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,47 +44,62 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async (token) => {
     try {
+      // Fetch message stats
       const statsResponse = await fetch(getApiUrl(API_ENDPOINTS.MESSAGE_STATS), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (!statsResponse.ok) {
-        setStats({ totalMessages: 0, newMessages: 0, repliedMessages: 0, totalProjects: 0 });
-        setRecentMessages([]);
-        setLoading(false);
-        return;
+      let messageStats = { total: 0, new: 0, replied: 0 };
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        messageStats = statsData.data || messageStats;
       }
 
-      const statsData = await statsResponse.json();
-      
-      setStats({
-        totalMessages: statsData.data.total || 0,
-        newMessages: statsData.data.new || 0,
-        repliedMessages: statsData.data.replied || 0,
-        totalProjects: 0
-      });
-      
+      // Fetch recent messages
       const messagesResponse = await fetch(getApiUrl(API_ENDPOINTS.MESSAGES) + '?limit=5', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (!messagesResponse.ok) {
-        setRecentMessages([]);
-        setLoading(false);
-        return;
+      let messages = [];
+      if (messagesResponse.ok) {
+        const messagesData = await messagesResponse.json();
+        messages = messagesData.data || [];
       }
 
-      const messagesData = await messagesResponse.json();
-      setRecentMessages(messagesData.data || []);
+      // THÊM MỚI: Fetch projects để tính tổng giá trị
+      const projectsResponse = await fetch('https://main-landing-page-backend-production.up.railway.app/api/projects', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      let totalProjects = 0;
+      let totalValue = 0;
+      if (projectsResponse.ok) {
+        const projectsData = await projectsResponse.json();
+        const projects = projectsData.data || [];
+        totalProjects = projects.length;
+        totalValue = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
+      }
+
+      setStats({
+        totalMessages: messageStats.total || 0,
+        newMessages: messageStats.new || 0,
+        repliedMessages: messageStats.replied || 0,
+        totalProjects: totalProjects,
+        totalValue: totalValue // THÊM MỚI
+      });
+
+      setRecentMessages(messages);
       setLoading(false);
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      setStats({ totalMessages: 0, newMessages: 0, repliedMessages: 0, totalProjects: 0 });
+      setStats({ totalMessages: 0, newMessages: 0, repliedMessages: 0, totalProjects: 0, totalValue: 0 });
       setRecentMessages([]);
       setLoading(false);
     }
@@ -95,7 +111,15 @@ const AdminDashboard = () => {
     navigate('/admin/login');
   };
 
-  const StatCard = ({ icon: Icon, title, value, color, trend }) => (
+  // Format tiền VNĐ
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(amount);
+  };
+
+  const StatCard = ({ icon: Icon, title, value, color, trend, isCurrency }) => (
     <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
       <div className="flex items-start justify-between mb-4">
         <div className={`p-3 rounded-lg ${color}`}>
@@ -109,7 +133,9 @@ const AdminDashboard = () => {
         )}
       </div>
       <h3 className="text-gray-500 text-sm mb-1">{title}</h3>
-      <p className="text-gray-800 text-3xl font-bold">{value}</p>
+      <p className={`text-gray-800 font-bold ${isCurrency ? 'text-2xl' : 'text-3xl'}`}>
+        {isCurrency ? formatCurrency(value) : value}
+      </p>
     </div>
   );
 
@@ -231,7 +257,8 @@ const AdminDashboard = () => {
             <p className="text-gray-500">Tổng quan hệ thống</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* THÊM 5 ô stats, bao gồm Tổng giá trị */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <StatCard
               icon={Mail}
               title="Tổng tin nhắn"
@@ -256,6 +283,14 @@ const AdminDashboard = () => {
               title="Dự án"
               value={stats.totalProjects}
               color="bg-purple-600"
+            />
+            {/* THÊM MỚI: Tổng giá trị */}
+            <StatCard
+              icon={DollarSign}
+              title="Tổng giá trị"
+              value={stats.totalValue}
+              color="bg-pink-500"
+              isCurrency={true}
             />
           </div>
 

@@ -23,7 +23,7 @@
    ============================================ */
 
 body {
-  background-color: var(--bg-primary);
+  background-color: #f9fafb; /* Light gray thay vì black */
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -96,10 +96,7 @@ body {
    SELECTION
    ============================================ */
 
-::selection {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: var(--text-primary);
-}
+
 
 /* ============================================
    ANIMATIONS
