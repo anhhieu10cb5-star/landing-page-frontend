@@ -1081,31 +1081,59 @@ const removeScreenshot = (index) => {
               </div>
 
               {/* Preview uploaded images */}
-              {screenshots.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {screenshots.map((img, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={img.url}
-                        alt={img.name}
-                        className="w-full h-32 object-cover rounded-lg border border-gray-200"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeScreenshot(index)}
-                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                      <p className="text-xs text-gray-500 mt-1 truncate">{img.name}</p>
+              {screenshots.length > 0 ? (
+              <div className="space-y-6">
+                {Object.entries(
+                  screenshots.reduce((groups, img) => {
+                    const date = img.uploadedAt ? new Date(img.uploadedAt).toLocaleDateString('vi-VN') : 'Không rõ ngày';
+                    if (!groups[date]) groups[date] = [];
+                    groups[date].push(img);
+                    return groups;
+                  }, {})
+                )
+                .sort((a, b) => {
+                  const dateA = new Date(a[1][0]?.uploadedAt || 0);
+                  const dateB = new Date(b[1][0]?.uploadedAt || 0);
+                  return dateB - dateA;
+                })
+                .map(([date, images]) => (
+                  <div key={date} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-gray-700 flex items-center">
+                        <Calendar className="w-4 h-4 mr-2 text-indigo-500" />
+                        {date}
+                      </h4>
+                      <span className="text-sm text-gray-500">{images.length} ảnh</span>
                     </div>
-                  ))}
-                </div>
-              )}
-
-              {screenshots.length === 0 && (
-                <p className="text-center text-gray-400 text-sm">Chưa có ảnh nào được upload</p>
-              )}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {images.map((img, index) => {
+                        const globalIndex = screenshots.findIndex(s => s.url === img.url);
+                        return (
+                          <div key={index} className="relative group">
+                            <img 
+                              src={img.url} 
+                              alt={img.name} 
+                              className="w-full h-28 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90"
+                              onClick={() => window.open(img.url, '_blank')}
+                            />
+                            <button 
+                              type="button" 
+                              onClick={() => removeScreenshot(globalIndex)} 
+                              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                            <p className="text-xs text-gray-500 mt-1 truncate" title={img.name}>{img.name}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-400 text-sm">Chưa có ảnh nào</p>
+            )}
             </div>
             
             
