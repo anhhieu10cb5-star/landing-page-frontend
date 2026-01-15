@@ -151,14 +151,34 @@ const AdminProjectForm = () => {
     window.location.href = '/admin/login';
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  setFormData(prev => ({
+    ...prev,
+    [name]: value
+  }));
+};
 
+// THÊM 2 FUNCTION NÀY NGAY ĐÂY ↓↓↓
+
+const formatNumber = (value) => {
+  if (!value) return '';
+  const number = value.toString().replace(/\D/g, '');
+  return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+};
+
+const handleBudgetChange = (e) => {
+  const rawValue = e.target.value.replace(/\./g, '');
+  setFormData(prev => ({
+    ...prev,
+    budget: rawValue
+  }));
+};
+
+  
+  
+  
+  
   const addTechnology = () => {
     if (newTech.trim() && !formData.technologies.includes(newTech.trim())) {
       setFormData(prev => ({
@@ -572,11 +592,11 @@ const AdminProjectForm = () => {
                     Ngân sách (VNĐ)
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     name="budget"
-                    value={formData.budget}
-                    onChange={handleInputChange}
-                    placeholder="50000000"
+                    value={formData.budget ? formatNumber(formData.budget.toString()) : ''}
+                    onChange={handleBudgetChange}
+                    placeholder="50.000.000"
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
