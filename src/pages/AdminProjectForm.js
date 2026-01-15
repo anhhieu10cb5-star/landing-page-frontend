@@ -1,6 +1,6 @@
 // src/pages/AdminProjectForm.js
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash2, Save, LayoutDashboard, MessageSquare, FolderKanban, LogOut, Key, Server, FileText, Eye, EyeOff, Copy, Check, Upload, X, Image } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Save, LayoutDashboard, MessageSquare, FolderKanban, LogOut, Key, Server, FileText, Eye, EyeOff, Copy, Check, Upload, X, Image, Calendar } from 'lucide-react';
 
 
 const AdminProjectForm = () => {
@@ -141,15 +141,13 @@ const AdminProjectForm = () => {
           setVpsInfo(project.credentials.vpsInfo || { host: '', username: '', password: '', sshKey: '' });
           setOtherSecrets(project.credentials.otherSecrets || '');
         }
-      }
-    
+
         // Load screenshots
         if (project.screenshots) {
           setScreenshots(project.screenshots);
         }
-           
-             
-        } catch (error) {
+      }
+    } catch (error) {
           console.error('Error loading project:', error);
           alert('❌ Lỗi khi tải dữ liệu dự án!');
         } finally {
