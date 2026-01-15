@@ -142,13 +142,20 @@ const AdminProjectForm = () => {
           setOtherSecrets(project.credentials.otherSecrets || '');
         }
       }
-    } catch (error) {
-      console.error('Error loading project:', error);
-      alert('❌ Lỗi khi tải dữ liệu dự án!');
-    } finally {
-      setLoading(false);
-    }
-  };
+    
+        // Load screenshots
+        if (project.screenshots) {
+          setScreenshots(project.screenshots);
+        }
+           
+             
+        } catch (error) {
+          console.error('Error loading project:', error);
+          alert('❌ Lỗi khi tải dữ liệu dự án!');
+        } finally {
+          setLoading(false);
+        }
+      };
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
