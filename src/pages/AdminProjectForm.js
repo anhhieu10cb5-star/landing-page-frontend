@@ -1,6 +1,7 @@
 // src/pages/AdminProjectForm.js
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash2, Save, LayoutDashboard, MessageSquare, FolderKanban, LogOut, Key, Server, FileText, Eye, EyeOff, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Save, LayoutDashboard, MessageSquare, FolderKanban, LogOut, Key, Server, FileText, Eye, EyeOff, Copy, Check, Upload, X, Image } from 'lucide-react';
+
 
 const AdminProjectForm = () => {
   const [loading, setLoading] = useState(false);
@@ -40,7 +41,11 @@ const AdminProjectForm = () => {
   const [otherSecrets, setOtherSecrets] = useState('');
   const [showPasswords, setShowPasswords] = useState({});
   const [copiedField, setCopiedField] = useState(null);
-
+  
+  const [screenshots, setScreenshots] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
@@ -257,6 +262,86 @@ const handleBudgetChange = (e) => {
     }
   };
 
+  
+  // Upload image to Bunny.net
+const uploadToBunny = async (file) => {
+  const STORAGE_ZONE = 'my-strorage-freelancer';
+  const API_KEY = '21305570-f3c6-4fbb-9be617d80e36-b963-4888';
+  const CDN_URL = 'https://devstudio-cdn.b-cdn.net';
+  
+  // Tạo đường dẫn: /projects/{projectCode}/{date}/{filename}
+  const today = new Date().toISOString().split('T')[0]; // 2025-01-15
+  const projectCode = formData.projectCode || 'TEMP';
+  const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+  const filePath = `projects/${projectCode}/${today}/${fileName}`;
+  
+  try {
+    const response = await fetch(`https://sg.storage.bunnycdn.com/${STORAGE_ZONE}/${filePath}`, {
+      method: 'PUT',
+      headers: {
+        'AccessKey': API_KEY,
+        'Content-Type': file.type
+      },
+      body: file
+    });
+
+    if (response.ok) {
+      return `${CDN_URL}/${filePath}`;
+    } else {
+      throw new Error('Upload failed');
+    }
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw error;
+  }
+};
+
+const handleImageUpload = async (e) => {
+  const files = Array.from(e.target.files);
+  if (files.length === 0) return;
+
+  setUploading(true);
+  setUploadProgress(0);
+
+  try {
+    const uploadedUrls = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      // Validate file
+      if (!file.type.startsWith('image/')) {
+        alert(`${file.name} không phải là file ảnh!`);
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        alert(`${file.name} quá lớn! Tối đa 10MB`);
+        continue;
+      }
+
+      const url = await uploadToBunny(file);
+      uploadedUrls.push({
+        url,
+        name: file.name,
+        uploadedAt: new Date().toISOString()
+      });
+      setUploadProgress(Math.round(((i + 1) / files.length) * 100));
+    }
+
+    setScreenshots(prev => [...prev, ...uploadedUrls]);
+    alert(`✅ Đã upload ${uploadedUrls.length} ảnh thành công!`);
+  } catch (error) {
+    alert('❌ Lỗi upload: ' + error.message);
+  } finally {
+    setUploading(false);
+    setUploadProgress(0);
+    e.target.value = ''; // Reset input
+  }
+};
+
+const removeScreenshot = (index) => {
+  setScreenshots(prev => prev.filter((_, i) => i !== index));
+};
+  
+  
   const validateForm = () => {
     if (!formData.projectCode.trim()) {
       alert('⚠️ Vui lòng nhập mã dự án!');
@@ -303,7 +388,8 @@ const handleBudgetChange = (e) => {
           apiKeys: apiKeys.filter(k => k.label.trim() !== '' || k.value.trim() !== ''),
           vpsInfo: vpsInfo,
           otherSecrets: otherSecrets
-        }
+        },
+        screenshots: screenshots
       };
 
       const url = isEdit 
@@ -541,17 +627,17 @@ const handleBudgetChange = (e) => {
                     Loại dự án
                   </label>
                   <select
-                    name="type"
-                    value={formData.type}
+                    name="status"
+                    value={formData.status}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="Website">Website</option>
-                    <option value="Mobile App">Mobile App</option>
-                    <option value="Web App">Web App</option>
-                    <option value="E-Commerce">E-Commerce</option>
-                    <option value="Landing Page">Landing Page</option>
-                    <option value="Backend API">Backend API</option>
+                    <option value="Pending">Chờ xử lý</option>
+                    <option value="In Progress">Đang thực hiện</option>
+                    <option value="Review">Đang review</option>
+                    <option value="Completed">Hoàn thành</option>
+                    <option value="On Hold">Tạm dừng</option>
+                    <option value="Cancelled">Đã hủy</option>
                   </select>
                 </div>
 
@@ -945,6 +1031,77 @@ const handleBudgetChange = (e) => {
               </div>
             </div>
 
+            
+            {/* Screenshots - Upload hình ảnh */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center">
+                  <Image className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-800">Screenshots</h2>
+                  <p className="text-sm text-gray-500">Upload hình ảnh tiến độ dự án để khách hàng xem</p>
+                </div>
+              </div>
+
+              {/* Upload Area */}
+              <div className="mb-4">
+                <label className="block w-full cursor-pointer">
+                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-indigo-400 hover:bg-indigo-50 transition-all">
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 font-medium mb-2">
+                      {uploading ? `Đang upload... ${uploadProgress}%` : 'Kéo thả hoặc click để upload'}
+                    </p>
+                    <p className="text-gray-400 text-sm">PNG, JPG, GIF - Tối đa 10MB mỗi ảnh</p>
+                    {uploading && (
+                      <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
+                        <div 
+                          className="bg-indigo-500 h-2 rounded-full transition-all" 
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {/* Preview uploaded images */}
+              {screenshots.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {screenshots.map((img, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={img.url}
+                        alt={img.name}
+                        className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeScreenshot(index)}
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                      <p className="text-xs text-gray-500 mt-1 truncate">{img.name}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {screenshots.length === 0 && (
+                <p className="text-center text-gray-400 text-sm">Chưa có ảnh nào được upload</p>
+              )}
+            </div>
+            
+            
             {/* Ghi chú */}
             <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
               <h2 className="text-xl font-bold text-gray-800 mb-6">Ghi chú</h2>
