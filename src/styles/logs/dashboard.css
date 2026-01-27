@@ -1,0 +1,55 @@
+.log-dashboard {
+  padding: var(--log-spacing-xl);
+  background-color: var(--log-bg-primary);
+  min-height: 100vh;
+  color: var(--log-text-secondary);
+}
+
+.log-dashboard__content {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: var(--log-spacing-xl);
+}
+
+.log-dashboard__main {
+  min-width: 0;
+}
+
+.log-dashboard__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--log-spacing-lg);
+}
+
+/* Spinner */
+.log-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--log-border);
+  border-top-color: var(--log-accent);
+  border-radius: 50%;
+  animation: log-spin 0.8s linear infinite;
+  margin-bottom: var(--log-spacing-md);
+}
+
+@keyframes log-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .log-dashboard__content {
+    grid-template-columns: 1fr;
+  }
+
+  .log-dashboard__sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .log-dashboard {
+    padding: var(--log-spacing-lg);
+  }
+}

@@ -19,6 +19,7 @@ import AdminProjects from './pages/AdminProjects';
 import AdminProjectForm from './pages/AdminProjectForm';
 import AdminProjectDetail from './pages/AdminProjectDetail';
 import AdminMessages from './pages/AdminMessages';
+import LogDashboard from './pages/LogDashboard';
 
 // Styles
 import './styles/theme.css';
@@ -47,6 +48,7 @@ function App() {
         <Route path="/admin/projects/:id" element={<AdminProjectDetail />} />
         <Route path="/admin/projects/:id/edit" element={<AdminProjectForm />} />
         <Route path="/admin/messages" element={<AdminMessages />} />
+        <Route path="/admin/logs" element={<LogDashboard />} />
       </Routes>
     </Router>
   );
