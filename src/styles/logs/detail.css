@@ -310,3 +310,21 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Event Type Colors */
+.event-type--exception {
+  color: #ef4444 !important;
+  font-weight: 600;
+}
+
+.event-type--lifecycle {
+  color: #8b5cf6 !important;
+}
+
+.event-type--metric {
+  color: #06b6d4 !important;
+}
+
+.event-type--log {
+  color: #94a3b8;
+}

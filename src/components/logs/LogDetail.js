@@ -355,10 +355,17 @@ const LogDetail = ({ log, onClose }) => {
                 <label>Sequence</label>
                 <span>#{log.sequence}</span>
               </div>
+              {log.event_type && (
               <div className="log-detail__field">
-                <label>Session</label>
-                <span title={log.sessionId}>{log.sessionId?.substring(0, 8)}...</span>
+                <label>Event Type</label>
+                <span className={`event-type--${log.event_type}`}>
+                  {log.event_type === 'exception' ? '🔴 Exception' :
+                  log.event_type === 'lifecycle' ? '🔄 Lifecycle' :
+                  log.event_type === 'metric' ? '📊 Metric' :
+                  '📝 Log'}
+                </span>
               </div>
+            )}
             </div>
           </div>
 
