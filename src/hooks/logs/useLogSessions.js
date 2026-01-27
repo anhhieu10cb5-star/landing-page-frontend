@@ -16,7 +16,11 @@ export const useLogSessions = (project) => {
       setLoading(true);
       const response = await api.get(`/logs/projects/${project}/sessions`);
       if (response.data.success) {
-        setSessions(response.data.data);
+        // Sort session mới nhất lên trên
+        const sorted = response.data.data.sort((a, b) => {
+          return new Date(b.lastLog) - new Date(a.lastLog);
+        });
+        setSessions(sorted);
       }
       setError(null);
     } catch (err) {
