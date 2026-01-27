@@ -13,7 +13,7 @@ import { useLogSessions } from '../hooks/logs/useLogSessions';
 import { useLogs } from '../hooks/logs/useLogs';
 import { useLogClaude } from '../hooks/logs/useLogClaude';
 import { useLogWebSocket } from '../hooks/logs/useLogWebSocket';
-import '../styles/LogDashboard.css';
+import '../styles/logs/index.css';
 
 const LogDashboard = () => {
   // State cho filters
