@@ -16,7 +16,7 @@
   background: var(--log-bg-secondary);
   border-radius: 12px;
   width: 100%;
-  max-width: 700px;
+  max-width: 800px;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
@@ -100,6 +100,9 @@
   color: var(--log-text-dim);
   margin: 0 0 var(--log-spacing-md) 0;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .log-detail__grid {
@@ -117,6 +120,7 @@
 .log-detail__field label {
   font-size: 12px;
   color: var(--log-text-dim);
+  text-transform: capitalize;
 }
 
 .log-detail__field span {
@@ -149,6 +153,131 @@
 .log-detail__level-badge--info { background: rgba(59, 130, 246, 0.2); color: var(--log-info); }
 .log-detail__level-badge--debug { background: rgba(107, 114, 128, 0.2); color: var(--log-debug); }
 
+/* === Context Panel Styles === */
+.log-detail__context {
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(0, 150, 255, 0.05) 100%);
+  border: 1px solid rgba(0, 217, 255, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.log-detail__context h4 {
+  color: #00d9ff;
+  margin-bottom: 12px;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.log-detail__context-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.log-detail__context-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: all 0.2s;
+}
+
+.log-detail__context-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(0, 217, 255, 0.3);
+}
+
+.log-detail__context-icon {
+  font-size: 20px;
+  min-width: 28px;
+  text-align: center;
+}
+
+.log-detail__context-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.log-detail__context-info label {
+  font-size: 10px;
+  color: var(--log-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.log-detail__context-info span {
+  font-size: 13px;
+  color: var(--log-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log-detail__context-custom {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.log-detail__context-custom h5 {
+  color: var(--log-text-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+/* App State Colors */
+.app-state--foreground,
+.app-state--active {
+  color: #4ade80 !important;
+}
+
+.app-state--background {
+  color: #facc15 !important;
+}
+
+.app-state--inactive {
+  color: #fb923c !important;
+}
+
+.app-state--running {
+  color: #4ade80 !important;
+}
+
+/* Text Colors */
+.text-danger {
+  color: #ef4444 !important;
+}
+
 .text-warning {
   color: var(--log-warn);
+}
+
+.text-success {
+  color: #22c55e !important;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .log-detail {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .log-detail__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .log-detail__context-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
