@@ -1,5 +1,5 @@
 // src/config.js
-export const API_BASE_URL = 'export const API_BASE_URL = 'https://api.devstudio.tech';';
+export const API_BASE_URL = 'https://api.devstudio.tech';
 
 export const API_ENDPOINTS = {
   LOGIN: '/api/auth/login',
