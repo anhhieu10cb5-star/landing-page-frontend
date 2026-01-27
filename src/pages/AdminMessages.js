@@ -41,7 +41,7 @@ const AdminMessages = () => {
     try {
       const token = localStorage.getItem('adminToken');
       
-      const response = await fetch('https://main-landing-page-backend-production.up.railway.app/api/messages', {
+      const response = await fetch('https://api.devstudio.tech/api/messages', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -109,7 +109,7 @@ const AdminMessages = () => {
     try {
       const token = localStorage.getItem('adminToken');
       
-      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/messages/${selectedMessage._id}/reply`, {
+      const response = await fetch(`https://api.devstudio.tech/api/messages/${selectedMessage._id}/reply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ const AdminMessages = () => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/messages/${id}`, {
+      const response = await fetch(`https://api.devstudio.tech/api/messages/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

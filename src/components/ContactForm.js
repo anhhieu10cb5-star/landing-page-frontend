@@ -122,7 +122,7 @@ const ContactForm = ({ lang = 'vi' }) => {
           'SB1AxaNwLXrfDBp2h'
         ),
 
-        fetch('https://main-landing-page-backend-production.up.railway.app/api/messages', {
+        fetch('https://api.devstudio.tech/api/messages', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

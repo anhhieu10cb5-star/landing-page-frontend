@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, AlertCircle, Loader, Code, Eye, EyeOff } from 'lucide-react';
+import api from '../utils/api';  // ← Thêm import
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -28,17 +29,11 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      const response = await fetch('https://main-landing-page-backend-production.up.railway.app/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
+      // ← Sửa từ fetch thành api
+      const response = await api.post('/auth/login', formData);
+      const data = response.data;
 
-      const data = await response.json();
-
-      if (!response.ok) {
+      if (!data.success) {
         throw new Error(data.message || 'Login failed');
       }
 
@@ -49,7 +44,7 @@ const AdminLogin = () => {
 
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.message || 'Email hoặc mật khẩu không đúng');
+      setError(err.response?.data?.message || err.message || 'Email hoặc mật khẩu không đúng');
     } finally {
       setLoading(false);
     }

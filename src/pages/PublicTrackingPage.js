@@ -28,7 +28,7 @@ const PublicTrackingPage = () => {
   const fetchProject = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/projects/track/${projectCode}`);
+      const response = await fetch(`https://api.devstudio.tech/api/projects/track/${projectCode}`);
       const data = await response.json();
 
       if (data.success) {

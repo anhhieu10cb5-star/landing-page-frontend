@@ -71,7 +71,7 @@ const AdminDashboard = () => {
       }
 
       // THÊM MỚI: Fetch projects để tính tổng giá trị
-      const projectsResponse = await fetch('https://main-landing-page-backend-production.up.railway.app/api/projects', {
+      const projectsResponse = await fetch('https://api.devstudio.tech/api/projects', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

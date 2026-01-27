@@ -39,7 +39,7 @@ function AdminProjectDetail() {
     const token = localStorage.getItem('adminToken');
     
     try {
-      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/projects/${id}`, {
+      const response = await fetch(`https://api.devstudio.tech/api/projects/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -81,7 +81,7 @@ function AdminProjectDetail() {
     try {
       const token = localStorage.getItem('adminToken');
       
-      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/projects/${project._id}`, {
+      const response = await fetch(`https://api.devstudio.tech/api/projects/${project._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

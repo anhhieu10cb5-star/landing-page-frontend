@@ -83,7 +83,7 @@ const AdminProjectForm = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`https://main-landing-page-backend-production.up.railway.app/api/projects/${id}`, {
+      const response = await fetch(`https://api.devstudio.tech/api/projects/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -398,8 +398,8 @@ const removeScreenshot = (index) => {
       };
 
       const url = isEdit 
-        ? `https://main-landing-page-backend-production.up.railway.app/api/projects/${projectId}`
-        : 'https://main-landing-page-backend-production.up.railway.app/api/projects';
+        ? `https://api.devstudio.tech/api/projects/${projectId}`
+        : 'https://api.devstudio.tech/api/projects';
       
       const method = isEdit ? 'PUT' : 'POST';
 
