@@ -155,60 +155,88 @@
 
 /* === Context Panel Styles === */
 .log-detail__context {
-  background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(0, 150, 255, 0.05) 100%);
-  border: 1px solid rgba(0, 217, 255, 0.2);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
 }
 
 .log-detail__context h4 {
-  color: #00d9ff;
-  margin-bottom: 12px;
-  font-size: 14px;
+  color: #38bdf8;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
 }
 
 .log-detail__context-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
 }
 
 .log-detail__context-card {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 10px 12px;
-  transition: all 0.2s;
+  gap: 12px;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  padding: 14px 16px;
+  transition: all 0.2s ease;
 }
 
 .log-detail__context-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(0, 217, 255, 0.3);
+  background: #334155;
+  border-color: #38bdf8;
+  transform: translateY(-2px);
 }
 
 .log-detail__context-icon {
-  font-size: 20px;
-  min-width: 28px;
+  font-size: 24px;
+  min-width: 32px;
   text-align: center;
 }
 
 .log-detail__context-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   overflow: hidden;
   flex: 1;
 }
 
 .log-detail__context-info label {
   font-size: 10px;
-  color: var(--log-text-dim);
+  color: #94a3b8;
   text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 500;
+}
+
+.log-detail__context-info span {
+  font-size: 14px;
+  color: #f1f5f9;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log-detail__context-custom {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #475569;
+}
+
+.log-detail__context-custom h5 {
+  color: #94a3b8;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin: 0 0 12px 0;
+  font-weight: 600;
   letter-spacing: 0.5px;
 }
 
