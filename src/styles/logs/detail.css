@@ -142,10 +142,11 @@
 
 .log-detail__level-badge {
   display: inline-block;
-  padding: 2px 8px;
-  border-radius: var(--log-radius-sm);
+  padding: 4px 12px;
+  border-radius: 6px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  width: fit-content;
 }
 
 .log-detail__level-badge--error { background: rgba(239, 68, 68, 0.2); color: var(--log-error); }
