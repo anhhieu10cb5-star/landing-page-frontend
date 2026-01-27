@@ -71,7 +71,7 @@ const AdminDashboard = () => {
       }
 
       // THÊM MỚI: Fetch projects để tính tổng giá trị
-      const projectsResponse = await fetch('https://api.devstudio.tech/api/projects', {
+      const projectsResponse = await fetch(getApiUrl(API_ENDPOINTS.PROJECTS), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
