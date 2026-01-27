@@ -35,4 +35,4 @@ export const useLogStats = () => {
   }, [fetchStats]);
 
   return { stats, loading, error, refetch: fetchStats };
-};s
+};
