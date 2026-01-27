@@ -22,11 +22,23 @@ const LogFilters = ({
     { value: 'error', label: '🔴 Error' }
   ];
 
+  // ═══════════════════════════════════════════════════════
+  // 🆕 SỬA: Format giờ Việt Nam
+  // ═══════════════════════════════════════════════════════
   const formatSessionLabel = (session) => {
-    const time = new Date(session.lastLog).toLocaleString('vi-VN');
+    const time = new Date(session.lastLog).toLocaleString('vi-VN', {
+      timeZone: 'Asia/Ho_Chi_Minh',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
     const errors = session.errorCount > 0 ? ` (❌${session.errorCount})` : '';
     return `${session.sessionId.substring(0, 8)}... - ${time}${errors}`;
   };
+  // ═══════════════════════════════════════════════════════
 
   return (
     <div className="log-filters">
