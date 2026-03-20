@@ -1,0 +1,37 @@
+:root {
+  /* Colors */
+  --log-bg-primary: #0f172a;
+  --log-bg-secondary: #1e293b;
+  --log-bg-tertiary: #334155;
+  
+  --log-text-primary: #f8fafc;
+  --log-text-secondary: #e2e8f0;
+  --log-text-muted: #94a3b8;
+  --log-text-dim: #64748b;
+  
+  --log-border: #334155;
+  
+  --log-accent: #3b82f6;
+  --log-accent-hover: #2563eb;
+  
+  --log-error: #ef4444;
+  --log-warn: #f59e0b;
+  --log-success: #10b981;
+  --log-info: #3b82f6;
+  --log-debug: #6b7280;
+  
+  /* Spacing */
+  --log-spacing-xs: 4px;
+  --log-spacing-sm: 8px;
+  --log-spacing-md: 12px;
+  --log-spacing-lg: 16px;
+  --log-spacing-xl: 24px;
+  
+  /* Border radius */
+  --log-radius-sm: 4px;
+  --log-radius-md: 6px;
+  --log-radius-lg: 8px;
+  
+  /* Font */
+  --log-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
