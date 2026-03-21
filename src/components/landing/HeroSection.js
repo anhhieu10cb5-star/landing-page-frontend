@@ -42,7 +42,7 @@ function HeroSection({ lang, setLang, t, scrollToSection }) {
       </div>
 
       {/* Stats - nhích xuống, to hơn */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 mt-12 pb-20">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 mt-4 pb-8">
         <StatsBar lang={lang} />
       </div>
 
