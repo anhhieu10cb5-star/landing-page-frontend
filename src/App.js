@@ -21,7 +21,7 @@ import AdminProjectDetail from './pages/AdminProjectDetail';
 import AdminMessages from './pages/AdminMessages';
 import LogDashboard from './pages/LogDashboard';
 
-// Styles
+// Stylesss
 import './styles/theme.css';
 
 function App() {
@@ -34,7 +34,7 @@ function App() {
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route path="/about" element={<AboutPage />} />
-        <Route path="/contact" element={<ContactPage />} /6
+        <Route path="/contact" element={<ContactPage />} 
         <Route path="/studio" element={<DevicePreviewDemo />} />
 
         {/* Project Tracking */}
@@ -55,4 +55,3 @@ function App() {
 }
 
 export default App;
-//comment 6
